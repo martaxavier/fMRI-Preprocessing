@@ -1,0 +1,33 @@
+movvol /home/mxavier/eeg-fmri/STANDARD//Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask.nii.gz
+targvol /usr/local/fsl/data/standard/MNI152_T1_2mm_brain.nii.gz
+outvol /home/mxavier/eeg-fmri/STANDARD/2mm/FSL_Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask.nii.gz
+invert 0
+tal    0
+talres 2
+regheader 1
+noresample 0
+interp  nearest (0)
+precision  uchar (0)
+Gdiag_no  -1
+Synth      0
+SynthSeed  1648599022
+
+Computing registration based on scanner-to-scanner
+
+Final tkRAS-to-tkRAS Matrix is:
+ 1.00000   0.00000   0.00000   0.00000;
+ 0.00000   0.00000  -1.00000   0.00000;
+ 0.00000   1.00000   0.00000   0.00000;
+ 0.00000   0.00000   0.00000   1.00000;
+
+
+Vox2Vox Matrix is:
+ 2.00000   0.00000   0.00000   37.00000;
+ 0.00000   0.00000  -2.00000   219.00000;
+ 0.00000   2.00000   0.00000   19.00000;
+ 0.00000   0.00000   0.00000   1.00000;
+
+Resampling
+Output registration matrix is identity
+
+mri_vol2vol done

@@ -1,0 +1,2 @@
+freeview /home/mxavier/eeg-fmri/STANDARD//Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask.nii.gz /home/mxavier/eeg-fmri/STANDARD/2mm/FSL_Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask.nii.gz&
+fslview /usr/local/fsl/data/standard/MNI152_T1_2mm_brain.nii.gz /home/mxavier/eeg-fmri/STANDARD/2mm/FSL_Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask.nii.gz -l Random-Rainbow&
