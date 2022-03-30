@@ -1,0 +1,10 @@
+visual_medial
+visual_lateral
+visual_occipital
+dmn
+cerebellum
+motor
+auditory
+executive
+left_fp
+right_fp 
