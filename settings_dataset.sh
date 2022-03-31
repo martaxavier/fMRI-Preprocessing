@@ -10,8 +10,7 @@ echo_spacing=0.00031     # seconds
 hp_freq=0.01             # Hz 
 pe_dir="y-"              # phase encoding direction 
 thr="20"                 # fix noise/signal threshold 
-anat_data_raw=""
-anat_data=""              
+anat_data_raw=""         
 func_data_raw=""
 
 elif [[ $dataset == "PARIS" ]]; then
