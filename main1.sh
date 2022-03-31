@@ -87,8 +87,9 @@ read TR < $tmpdir/TR.txt
 read echo_spacing < $tmpdir/echo_spacing.txt
 read hp_freq < $tmpdir/hp_freq.txt
 read fwhm < $tmpdir/fwhm.txt
-read fix_data < $tmpdir/fix_data.txt
 read fix_thr < $tmpdir/fix_thr.txt
+read fix_train_data < $tmpdir/fix_train_data.txt
+read fix_txt_out < $tmpdir/fix_txt_out.txt
 read func_data_raw < $tmpdir/func_data_raw.txt
 read subj_list < $tmpdir/subj_list.txt 
 

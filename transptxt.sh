@@ -43,7 +43,7 @@ n_cols=$(awk '{print NF}' $data | sort -nu | head -n 1)
 # count number of rows
 n_rows=$(cat $data | wc -l)
 
-echo -n "`basename $0`: $n_rows rows , $n_cols columns --> "
+#echo -n "`basename $0`: $n_rows rows , $n_cols columns --> "
 
 # extract column
 rm -f $out
@@ -58,4 +58,4 @@ n_cols=$(awk '{print NF}' $out | sort -nu | head -n 1)
 # count number of rows
 n_rows=$(cat $out | wc -l)
 
-echo "$n_rows rows , $n_cols columns."
+#echo "$n_rows rows , $n_cols columns."

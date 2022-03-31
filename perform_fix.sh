@@ -28,5 +28,5 @@
 /usr/local/fix/fix -f mel.ica 
 
 # Classify components 
-/usr/local/fix/fix -c mel.ica /usr/local/fix/training_files/$fix_data $fix_thr
+/usr/local/fix/fix -c mel.ica /usr/local/fix/training_files/$fix_train_data $fix_thr
 

@@ -5,7 +5,7 @@
 # Create unique directory for temporary files 
 tmpdir=$(mktemp -d) 
 
-# define exit trap
+# Define exit trap
 trap "rm -f $tmpdir/* ; rmdir $tmpdir ; exit" EXIT
 
 # Count number of columns in the data

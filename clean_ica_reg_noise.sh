@@ -57,6 +57,8 @@ if [[ $flag_rp == 1 ]]; then
     
     # High-pass filter the 6 realignment parameters  
     . $path/perform_temporal_hpf_motionpars.sh 
+    
+    echo "Temporal high-pass of motion realignment parameters done for subject $i" 
 
     if [[ $flag_rp_exp == 1 ]]; then
     
@@ -66,7 +68,9 @@ if [[ $flag_rp == 1 ]]; then
       if [[ -f $data_out ]]; then rm $data_out; fi
       
       # Compute the time-series expansions of the realignment parameters 
-      . $path/motionpars_expansions.sh     
+      . $path/motionpars_expansions.sh   
+      
+      echo "Time-series expansions of motion realignment parameters computed for subject $i"  
     
     fi  
    
@@ -97,18 +101,26 @@ fi
 if [[ -f confound_design.txt ]]; then rm confound_design.txt; fi
 paste regressor* | column -s $'\t' -t >> confound_design.txt; rm regressor*
 
-# Add confound_design to the melodic_mix
-if [[ -f melodic_mix_confound_design.txt ]]; then rm melodic_mix_confound_design.txt; fi
-paste mel.ica/filtered_func_data.ica/melodic_mix confound_design.txt | column -s $'\t' -t >> melodic_mix_confound_design.txt;
-
 # Read N-ICs from the file returned by FIX+manual classification 
-noise_ics=$(tail -1 mel.ica/fix4melview_Standard_thr20.txt | head -1) 
+noise_ics=$(tail -1 "mel.ica/${fix_txt_out}" | head -1) 
 
 # Remove rectangular brackets from the string in the variable "noise_ics", 
 # turning into a comma separated list of numbers
 noise_ics="${noise_ics:1:-1}"
 
-# Perform nonaggressive regression of IC-N and nuisance regressors 
-fsl_regfilt -i $func_data_in -o $func_data_out -d melodic_mix_confound_design.txt -f "$noise_ics"
+if [ "$noise_ics" == "" ]; then
 
+  echo "Warning: there are no noise ICs in ${fix_txt_out} for subject $i"
+  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design.txt 
+ 
+else
+
+  # Add confound_design to the melodic_mix
+  if [[ -f melodic_mix_confound_design.txt ]]; then rm melodic_mix_confound_design.txt; fi
+  paste mel.ica/filtered_func_data.ica/melodic_mix confound_design.txt | column -s $'\t' -t >> melodic_mix_confound_design.txt;
+  
+  # Perform nonaggressive regression of IC-N and nuisance regressors 
+  fsl_regfilt -i $func_data_in -o $func_data_out -d melodic_mix_confound_design.txt -f "$noise_ics"
+
+fi
  

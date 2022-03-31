@@ -102,12 +102,16 @@ if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 # Create unique temporary directory 
 tmpdir=$(mktemp -d) 
 
+# Define exit trap
+trap "rm -f $tmpdir/* ; rmdir $tmpdir ; exit" EXIT
+
 # Read dataset settings
 . settings_dataset.sh
 read TR < $tmpdir/TR.txt
 read hp_freq < $tmpdir/hp_freq.txt
 read fwhm < $tmpdir/fwhm.txt
-read fix_data < $tmpdir/fix_data.txt
+read fix_train_data < $tmpdir/fix_train_data.txt
+read fix_txt_out < $tmpdir/fix_txt_out.txt
 read subj_list < $tmpdir/subj_list.txt 
 
 #---------------------------------------- Perform registration to standard space -------------------------------------# 
@@ -179,7 +183,9 @@ fi
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Iterate through cleanup pipelines 
-for cleanup in "${cleanup_list[@]}"; do  
+for cleanup in "${cleanup_list[@]}"; do 
+
+  echo "Applying the ${cleanup} cleanup pipeline..." 
 
   cd $path 
   
@@ -215,6 +221,8 @@ for cleanup in "${cleanup_list[@]}"; do
       cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
       . $path/clean_ica_reg_noise.sh 
       
+      echo "Nuisance regression (N-ICs + regressors) performed for subject $i"
+      
     done
     
     # Update input func data for rest of pipeline
@@ -237,6 +245,8 @@ for cleanup in "${cleanup_list[@]}"; do
       cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
       . $path/clean_fix_noise.sh 
       
+      echo "FIX-ICA performed for subject $i"      
+      
     done
     
     # Update input func data for rest of pipeline
@@ -257,6 +267,8 @@ for cleanup in "${cleanup_list[@]}"; do
       
       cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
       . $path/perform_nuisance_reg.sh 
+      
+      echo "Nuisance regression performed for subject $i"      
       
     done
     
@@ -280,6 +292,8 @@ for cleanup in "${cleanup_list[@]}"; do
       cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
       . $path/perform_temporal_hpf.sh
       
+      echo "Temporal high-pass filtering performed for subject $i"      
+      
     done
     
     # Update input func data for rest of pipeline
@@ -299,6 +313,8 @@ for cleanup in "${cleanup_list[@]}"; do
     
       cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
       . $path/perform_spatial_smoothing.sh
+      
+      echo "Spatial smoothing performed for subject $i"      
     
     done
   
@@ -320,6 +336,8 @@ for cleanup in "${cleanup_list[@]}"; do
     
     # Rename the output according to the current pipeline
     cp $func_data_in ${func_data_final}.nii.gz
+    
+    echo "Cleanup finished for subject $i"     
   
   done
     
