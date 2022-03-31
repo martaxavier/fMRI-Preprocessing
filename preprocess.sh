@@ -59,6 +59,15 @@
   
   # Copy registration files
   if [[ ! -d unwarp ]]; then mkdir unwarp; fi; cp $path/$dataset/DERIVATIVES/$i/reg/* unwarp
+  
+  # Remove first 5 volumes of data 
+  if [[ $dataset == "NODDI" ]]
+  then
+    fslsplit epi
+    rm vol0000.nii.gz vol0001.nii.gz vol0002.nii.gz vol0003.nii.gz vol0004.nii.gz
+    fslmerge -t epi vol*
+    rm vol*
+  else   
 
   # Extract example volume from middle volume
   n_vols=$(fslval epi dim4) 
