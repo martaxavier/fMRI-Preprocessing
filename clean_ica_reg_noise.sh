@@ -41,11 +41,47 @@ fi
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Concatenate nuisance signals to build confound model  
-if [[ $flag_csf == 1 ]]; then cp CSF_before_ica_cleanup.txt regressor_csf.txt; fi
-if [[ $flag_wm == 1 ]]; then cp WM_before_ica_cleanup.txt regressor_wm.txt; fi
-if [[ $flag_gs == 1 ]]; then cp GS_before_ica_cleanup.txt regressor_gs.txt; fi
-if [[ $flag_mo == 1 ]]; then cp mo_confound.txt regressor_mo.txt; fi
+declare -a reg_out=()
+r=0
 
+# Add CSF average signal regressor 
+if [[ $flag_csf == 1 ]]; then 
+  cp CSF_before_ica_cleanup.txt regressor_csf.txt
+  r=$(echo "$r + 1" | bc -l)
+  reg_out=( "${reg_out[@]}" "$r" )
+fi
+
+# Add white matter average signal regressor 
+if [[ $flag_wm == 1 ]]; then 
+  cp WM_before_ica_cleanup.txt regressor_wm.txt
+  r=$(echo "$r + 1" | bc -l)  
+  reg_out=( "${reg_out[@]}" "$r" )
+fi
+
+# Add global signal regressor 
+if [[ $flag_gs == 1 ]]; then 
+  cp GS_before_ica_cleanup.txt regressor_gs.txt
+  r=$(echo "$r + 1" | bc -l)    
+  reg_out=( "${reg_out[@]}" "$r" )
+fi
+
+# Add motion outliers regressors 
+if [[ $flag_mo == 1 ]]; then 
+
+  cp mo_confound.txt regressor_mo.txt
+  n_cols=$(awk '{print NF}' mo_confound.txt | sort -nu | head -n 1)
+  
+  rend=$(echo "$r + $n_cols" | bc -l)
+  r=$(echo "$r + 1" | bc -l)
+  while [ $r -le $rend ]; do
+    reg_out=( "${reg_out[@]}" "$r" )
+    r=$(echo "$r + 1" | bc -l)
+  done
+  r=$rend
+
+fi
+
+# Add motion realignment parameters regressors 
 if [[ $flag_rp == 1 ]]; then
 
   if [[ $flag_hpf == 0 ]]; then 
@@ -68,11 +104,11 @@ if [[ $flag_rp == 1 ]]; then
       if [[ -f $data_out ]]; then rm $data_out; fi
       
       # Compute the time-series expansions of the realignment parameters 
-      . $path/motionpars_expansions.sh   
+      . $path/motionpars_expansions.sh  
       
       echo "Time-series expansions of motion realignment parameters computed for subject $i"  
     
-    fi  
+    fi  # flag_rp_exp == 1
    
   else # flag_hpf == 1
   
@@ -89,13 +125,38 @@ if [[ $flag_rp == 1 ]]; then
       # Compute the time-series expansions of the realignment parameters 
       . $path/motionpars_expansions.sh     
     
-    fi 
+    fi # flag_rp_exp == 1
   
-  fi 
+  fi  # flag_hfp
   
   cp $data_out regressor_rp.txt
   
-fi
+  if [[ $flag_rp_exp == 1 ]]; then
+  
+    rend=$(echo "$r + 24" | bc -l)
+    r=$(echo "$r + 1" | bc -l)
+    while [ $r -le $rend ]; do
+      reg_out=( "${reg_out[@]}" "$r" )
+      r=$(echo "$r + 1" | bc -l)
+    done
+  
+  else 
+  
+    rend=$(echo "$r + 6" | bc -l)
+    r=$(echo "$r + 1" | bc -l)
+    while [ $r -le $rend ]; do
+      reg_out=( "${reg_out[@]}" "$r" )
+      r=$(echo "$r + 1" | bc -l)
+    done
+  
+  fi
+  
+  r=$rend
+  
+fi #flag_rp
+
+# Turn reg_out into a comma separated list 
+echo ${reg_out// /,}
 
 # Remove previous confound_design (if existent) and write new one 
 if [[ -f confound_design.txt ]]; then rm confound_design.txt; fi
@@ -107,20 +168,18 @@ noise_ics=$(tail -1 "mel.ica/${fix_txt_out}" | head -1)
 # Remove rectangular brackets from the string in the variable "noise_ics", 
 # turning into a comma separated list of numbers
 noise_ics="${noise_ics:1:-1}"
+reg_out=( "${reg_out[@]}" "$noise_ics" ) 
 
 if [ "$noise_ics" == "" ]; then
-
   echo "Warning: there are no noise ICs in ${fix_txt_out} for subject $i"
-  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design.txt 
- 
 else
 
   # Add confound_design to the melodic_mix
   if [[ -f melodic_mix_confound_design.txt ]]; then rm melodic_mix_confound_design.txt; fi
-  paste mel.ica/filtered_func_data.ica/melodic_mix confound_design.txt | column -s $'\t' -t >> melodic_mix_confound_design.txt;
+  paste confound_design.txt mel.ica/filtered_func_data.ica/melodic_mix | column -s $'\t' -t >> confound_design_melodic_mix.txt;
   
   # Perform nonaggressive regression of IC-N and nuisance regressors 
-  fsl_regfilt -i $func_data_in -o $func_data_out -d melodic_mix_confound_design.txt -f "$noise_ics"
+  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design_melodic_mix.txt -f "$reg_out"
 
 fi
  
