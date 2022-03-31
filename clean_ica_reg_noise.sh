@@ -72,10 +72,9 @@ if [[ $flag_mo == 1 ]]; then
   n_cols=$(awk '{print NF}' mo_confound.txt | sort -nu | head -n 1)
   
   rend=$(echo "$r + $n_cols" | bc -l)
-  r=$(echo "$r + 1" | bc -l)
   while [ $r -le $rend ]; do
-    reg_out=( "${reg_out[@]}" "$r" )
     r=$(echo "$r + 1" | bc -l)
+    reg_out=( "${reg_out[@]}" "$r" )
   done
   r=$rend
 
@@ -123,7 +122,9 @@ if [[ $flag_rp == 1 ]]; then
       if [[ -f $data_out ]]; then rm $data_out; fi
       
       # Compute the time-series expansions of the realignment parameters 
-      . $path/motionpars_expansions.sh     
+      . $path/motionpars_expansions.sh   
+      
+      echo "Time-series expansions of motion realignment parameters computed for subject $i"    
     
     fi # flag_rp_exp == 1
   
@@ -156,30 +157,49 @@ if [[ $flag_rp == 1 ]]; then
 fi #flag_rp
 
 # Turn reg_out into a comma separated list 
-echo ${reg_out// /,}
+reg_out=($(echo ${reg_out[@]} | tr " " ","))
 
 # Remove previous confound_design (if existent) and write new one 
 if [[ -f confound_design.txt ]]; then rm confound_design.txt; fi
 paste regressor* | column -s $'\t' -t >> confound_design.txt; rm regressor*
 
 # Read N-ICs from the file returned by FIX+manual classification 
+unset noise_ics
 noise_ics=$(tail -1 "mel.ica/${fix_txt_out}" | head -1) 
 
 # Remove rectangular brackets from the string in the variable "noise_ics", 
 # turning into a comma separated list of numbers
 noise_ics="${noise_ics:1:-1}"
-reg_out=( "${reg_out[@]}" "$noise_ics" ) 
+noise_ics=($(echo ${noise_ics[@]} | tr "," " "))
+
+c=0
+for n in "${noise_ics[@]}"; do 
+  nnew=$(echo "$n + $r" | bc -l);
+  noise_ics[$c]=$nnew
+  c=$(echo "$c + 1" | bc -l); 
+done
+
+noise_ics=($(echo ${noise_ics[@]} | tr " " ","))
 
 if [ "$noise_ics" == "" ]; then
+  
   echo "Warning: there are no noise ICs in ${fix_txt_out} for subject $i"
+  
+  
+  # Perform nonaggressive regression of IC-N and nuisance regressors 
+  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design.txt -f "$reg_out" 
+  
 else
 
+  reg_out=( "${reg_out[@]}" "," ) 
+  reg_out=( "${reg_out[@]}" "$noise_ics" ) 
+    
   # Add confound_design to the melodic_mix
-  if [[ -f melodic_mix_confound_design.txt ]]; then rm melodic_mix_confound_design.txt; fi
+  if [[ -f confound_design_melodic_mix.txt ]]; then rm confound_design_melodic_mix.txt; fi
   paste confound_design.txt mel.ica/filtered_func_data.ica/melodic_mix | column -s $'\t' -t >> confound_design_melodic_mix.txt;
   
   # Perform nonaggressive regression of IC-N and nuisance regressors 
-  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design_melodic_mix.txt -f "$reg_out"
+  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design_melodic_mix.txt -f "$reg_out" 
 
 fi
- 
+
