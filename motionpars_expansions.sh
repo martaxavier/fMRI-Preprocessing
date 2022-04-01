@@ -1,69 +1,36 @@
 #!/bin/bash
 
-# This script computes the time-series expansions of the realignment parameters 
+if [ $# -lt 2 ] ; then
+    cat << EOF
+Usage: mp_diffpow24 regparam.dat diffregparam.dat
 
-# Create unique directory for temporary files 
-tmpdir=$(mktemp -d) 
+Creates file with 24 columns; the first 6 are the motion
+parameters, the next 6 are the square of the motion
+parameters, the next 6 are the temporal difference of motion parameters, 
+and the next 6 are the square of the differenced values.  This is useful for
+accounting for 'spin history' effects, and variation not 
+otherwise accounted for by motion correction.
 
-# Define exit trap
-trap "rm -f $tmpdir/* ; rmdir $tmpdir ; exit" EXIT
+\$Id: mp_diffpow24.sh,v 1.1 2012/10/26 11:29:29 nichols Exp $
+EOF
+    exit 1
+fi
 
-# Count number of columns in the data
-n_cols=$(awk '{print NF}' $data | sort -nu | head -n 1)
+f=`echo $2 | sed 's/\....$//'`
 
-# Count number of time-points 
-n_rows=$(cat $data | wc -l)
+cat <<EOF > /tmp/$$-mp-diffpow
+{
+  if (NR==1) {
+    mp1=\$1;mp2=\$2;mp3=\$3;mp4=\$4;mp5=\$5;mp6=\$6;
+  }
+  printf("  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e    %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e    %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e  %+0.7e\n",
+         \$1,\$2,\$3,\$4,\$5,\$6,
+         \$1^2,\$2^2,\$3^2,\$4^2,\$5^2,\$6^2,
+         \$1-mp1,\$2-mp2,\$3-mp3,\$4-mp4,\$5-mp5,\$6-mp6,
+         (\$1-mp1)^2,(\$2-mp2)^2,(\$3-mp3)^2,(\$4-mp4)^2,(\$5-mp5)^2,(\$6-mp6)^2);
+  mp1=\$1;mp2=\$2;mp3=\$3;mp4=\$4;mp5=\$5;mp6=\$6;
+}
+EOF
+awk -f /tmp/$$-mp-diffpow "$1" > ${f}.dat
 
-# Transpose input to please fslascii2img
-$path/transptxt.sh $data $tmpdir/data_transp
-
-# Create pseudoimage - RPs 
-fslascii2img $tmpdir/data_transp $n_cols 1 1 $n_rows 1 1 1 $TR $tmpdir/data.nii.gz
-
-# Quadratic term of RPs 
-fslmaths $tmpdir/data.nii.gz -sqr $tmpdir/data_quad.nii.gz
-
-# Derivative of RPs
-# Circular shift
-fslsplit $tmpdir/data.nii.gz $tmpdir/tmp
-n_vols=$(fslval $tmpdir/data dim4) 
-n_vols=$(echo "$n_vols -1" | bc -l)
-
-declare -a tmp_list=()
-c=0
-while [ $c -le $n_vols ]; do
-  if [[ $c -eq n_vols ]]; then
-    tmp_list=( "0${c}" "${tmp_list[@]}" ) 
-    tmp_list[0]="tmp${tmp_list[0]}"
-    break
-  elif [[ $c -le 9 ]]; then
-    tmp_list=( "${tmp_list[@]}" "000${c}" ) 
-  elif [[ $c -le 99 ]]; then
-    tmp_list=( "${tmp_list[@]}" "00${c}" ) 
-  elif [[ $c -le 999 ]]; then
-    tmp_list=( "${tmp_list[@]}" "0${c}" ) 
-  fi
-  tmp_list[c]="tmp${tmp_list[c]}"
-  c=$(echo "$c + 1" | bc -l)
-done
-
-fslmerge -t $tmpdir/data_shift.nii.gz $tmpdir/$tmp_list; rm $tmpdir/tmp* 
-fslmaths $tmpdir/data.nii.gz -sub $tmpdir/data_shift.nii.gz $tmpdir/data_der.nii.gz
-
-# Quadratic term of the derivative of RPs
-fslmaths $tmpdir/data_der.nii.gz -sqr $tmpdir/data_der_quad.nii.gz
-
-# Convert to ascii
-fsl2ascii $tmpdir/data.nii.gz $tmpdir/data
-fsl2ascii $tmpdir/data_quad.nii.gz $tmpdir/data_quad
-fsl2ascii $tmpdir/data_der.nii.gz $tmpdir/data_der
-fsl2ascii $tmpdir/data_der_quad.nii.gz $tmpdir/data_der_quad
-
-# Concatenate ascii
-rm $tmpdir/data.nii.gz $tmpdir/data_quad.nii.gz $tmpdir/data_der.nii.gz $tmpdir/data_der_quad.nii.gz $tmpdir/data_shift.nii.gz $tmpdir/data_transp
-cat $tmpdir/data????? | sed '/^\s*$/d' > "$tmpdir/reg_$data_out";
-cat $tmpdir/data_quad????? | sed '/^\s*$/d' > "$tmpdir/reg_quad_$data_out"
-cat $tmpdir/data_der????? | sed '/^\s*$/d' > "$tmpdir/reg_der_$data_out"
-cat $tmpdir/data_der_quad????? | sed '/^\s*$/d' > "$tmpdir/reg_der_quad_$data_out"
-paste $tmpdir/reg* | column -s $'\t' -t >> $data_out
-rm $tmpdir/reg* 
+/bin/rm /tmp/$$-mp-diffpow

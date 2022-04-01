@@ -3,10 +3,11 @@
 #This script performs temporal high-pass filtering of the input regressors
 
 # Create unique directory for temporary files 
-tmpdir=$(mktemp -d) 
+if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
+tmpdir=$path/tmp
 
 # define exit trap
-trap "rm -f $tmpdir/* ; rmdir $tmpdir ; exit" EXIT
+#trap "rm -f $tmpdir/* ; rmdir $tmpdir ; exit" EXIT
 
 # Count number of columns in the data
 n_cols=$(awk '{print NF}' $data | sort -nu | head -n 1)
@@ -31,4 +32,7 @@ fsl2ascii $tmpdir/data_hpf.nii.gz $tmpdir/data_hpf
 
 # concatenate ascii
 cat $tmpdir/data_hpf????? | sed '/^\s*$/d' > $data_out
+
+rm $tmpdir/*
+
 

@@ -103,7 +103,8 @@ if [[ $flag_rp == 1 ]]; then
       if [[ -f $data_out ]]; then rm $data_out; fi
       
       # Compute the time-series expansions of the realignment parameters 
-      . $path/motionpars_expansions.sh  
+      ${path}motionpars_expansions.sh $data $data_out
+      mv prefiltered_func_data_mcf_exp_tempfilt.dat prefiltered_func_data_mcf_exp_tempfilt.txt
       
       echo "Time-series expansions of motion realignment parameters computed for subject $i"  
     
@@ -121,8 +122,9 @@ if [[ $flag_rp == 1 ]]; then
       data_out=prefiltered_func_data_mcf_exp.txt
       if [[ -f $data_out ]]; then rm $data_out; fi
       
-      # Compute the time-series expansions of the realignment parameters 
-      . $path/motionpars_expansions.sh   
+      # Compute the time-series expansions of the realignment parameters   
+      ${path}motionpars_expansions.sh $data $data_out
+      mv prefiltered_func_data_mcf_exp.dat prefiltered_func_data_mcf_exp.txt
       
       echo "Time-series expansions of motion realignment parameters computed for subject $i"    
     

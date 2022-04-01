@@ -77,18 +77,18 @@
 #    filtered_func_data_preprocessed_ica_mo_csf_reg: functional data after ica + nonagressive regression of N-IC, RP, MO and CSF time-series
 #    filtered_func_data_preprocessed_ica_mo_csf_wm_reg: functional data after ica + nonagressive regression of N-IC, RP, MO, CSF and WM time-series
 
-
 path=/home/mxavier/eeg-fmri/
 cd $path
+
 
 #--------------------------------------------- Declare analysis settings ---------------------------------------------# 
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Declare analysis settings 
-dataset=NODDI
+dataset=PARIS
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
-run="run-1"              # "run-1" "run-2" "run-3"
+run="run-2"              # "run-1" "run-2" "run-3"
 flag_std_reg=0
 
 # Cleanup list: 
@@ -100,10 +100,11 @@ if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Create unique temporary directory 
-tmpdir=$(mktemp -d) 
+if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
+tmpdir=$path/tmp
 
 # Define exit trap
-trap "rm -f $tmpdir/* ; rmdir $tmpdir ; exit" EXIT
+#trap "rm -f $tmpdir/* ; rmdir $tmpdir ; exit" EXIT
 
 # Read dataset settings
 . settings_dataset.sh

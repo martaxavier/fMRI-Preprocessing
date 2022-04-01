@@ -78,8 +78,8 @@ cd $path
 #--------------------------------------------------- Read dataset settings -------------------------------------------# 
 #---------------------------------------------------------------------------------------------------------------------# 
 
-# Create unique temporary directory 
-tmpdir=$(mktemp -d) 
+if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
+tmpdir=$path/tmp
 
 # Read dataset settings
 . settings_dataset.sh
