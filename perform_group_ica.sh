@@ -32,17 +32,17 @@ cd $path
 dataset=PARIS
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
-run="run-3"              # "run-1" "run-2" "run-3"
-flag_std_reg=0
+flag_std_reg=1
 
 # Run list
-run_list=("run-1", "run-2", "run-3") 
+run_list=("run-1" "run-2" "run-3") 
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg", "ica_mo_csf_reg", "ica_mo_csf_wm_reg")
+#cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
+cleanup_list=("ica_mo_csf_reg")
 
 # Declare reference RSN template ("smith" - Smith, 2009; "yeo" - Yeo, 2011)  
-rsn_template = "smith"
+rsn_template="smith"
 
 if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 
@@ -54,25 +54,16 @@ if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 if [ $rsn_template == "smith" ]; then
 
   input_list="list_smith_rsns.txt"
+  ref_dir=STANDARD 
+  ref=PNAS_Smith09_rsn10_bin.nii.gz
   
 elif [ $rsn_template == "yeo" ]; then
 
   input_list="list_yeo_rsns.txt"
+  ref_dir=STANDARD
+  ref=Yeo11_rsn7.nii.gz
   
 fi
-
-rsn_list=() 
-n=1
-
-# Read specified file line by line and 
-# add rsn name to variable rsn_list
-while read line; do
-
-new_rsn=$(echo "$line") 
-rsn_list=( "${rsn_list[@]}" $new_rsn )
-n=$((n+1))
-
-done < $input_list
 
 
 #--------------------------------------------------- Read dataset settings -------------------------------------------# 
@@ -92,6 +83,7 @@ read TR < $tmpdir/TR.txt
 if [[ ! -d $dataset/PREPROCESS/groupICA ]]; then mkdir $dataset/PREPROCESS/groupICA; fi;
 if [[ ! -d $dataset/PREPROCESS/groupICA.stats ]]; then mkdir $dataset/PREPROCESS/groupICA.stats; fi;
 
+
 #------------------------------------------------- Assign RSN list  --------------------------------------------------# 
 #---------------------------------------------------------------------------------------------------------------------# 
 
@@ -110,6 +102,7 @@ while [ $c -le $rsn_num ]; do
   rsn_list=( "${rsn_list[@]}" "00${c}" ) 
   c=$(echo "$c + 1" | bc -l)
 done 
+
 
 #------------------------------------------- Go through cleanup pipelines  -------------------------------------------# 
 #---------------------------------------------------------------------------------------------------------------------# 
@@ -148,7 +141,7 @@ for cleanup in "${cleanup_list[@]}"; do
          applywarp --in=$func_data --ref=/usr/local/fsl/data/standard/MNI152_T1_2mm_brain \
          --out="${func_data}2standard" --warp=unwarp/example_func2standard_coef.nii.gz \
          
-         echo "Performed registration to MNI for subject $i" 
+         echo "Performed registration to MNI for subject $i, run $run" 
          
        done
        
@@ -173,7 +166,7 @@ for cleanup in "${cleanup_list[@]}"; do
       if [[ $run == "run-3" ]] && [[ $i == "sub-03" ]]; then continue; fi
       if [[ $run == "run-3" ]] && [[ $i == "sub-28" ]]; then continue; fi
          
-      echo "$path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/${func_data}2standard" >> inputlist_4groupICA.txt
+      echo $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/${func_data}2standard >> inputlist_4groupICA.txt
       
     done
   
@@ -260,7 +253,8 @@ for cleanup in "${cleanup_list[@]}"; do
   
   # Move final file to analysis directory 
   if [[ ! -d $gica_dir ]]; then mkdir $gica_dir; fi;
-  mv group* $gica_dir  
+  if [[ ! -d "$gica_dir/$rsn_template" ]]; then mkdir "$gica_dir/$rsn_template"; fi;
+  mv group* "$gica_dir/$rsn_template"  
   
   cd ..  
    

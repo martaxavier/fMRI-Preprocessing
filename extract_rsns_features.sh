@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# SCRIPT MIGHT HAVE BUGS 
 #This script extracts the average signal from a given ROI, obtained by  
 #thresholding the IC in melodic_IC most similar with the DMN in Smith et al. 2009 
 #
@@ -50,10 +51,10 @@ task="task-rest"         # "task-rest" "task-calib"
 run="run-3"              # "run-1" "run-2" "run-3"
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg", "ica_mo_csf_reg", "ica_mo_csf_wm_reg")
+cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
 
 # Declare reference RSN template ("smith" - Smith, 2009; "yeo" - Yeo, 2011)  
-rsn_template = "smith"
+rsn_template="smith"
 
 if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 
@@ -68,7 +69,7 @@ if [ $rsn_template == "smith" ]; then
   
 elif [ $rsn_template == "yeo" ]; then
 
-  input_list="list_yeo_rsns.txt"
+  input_list="list_yeo_rsns.txt"  
   
 fi
 

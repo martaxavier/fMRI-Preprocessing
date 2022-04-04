@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#This script performs subject level ica analysis of the preprocessed functional data 
+# SCRIPT MIGHT HAVE BUGS 
+# This script performs subject level ica analysis of the preprocessed functional data 
 #
 # The following scripts are called: 
 #    prepare_pipeline: assigns, for each pipeline, input functional data and output directory
@@ -58,47 +59,20 @@ run="run-3"              # "run-1" "run-2" "run-3"
 flag_std_reg=0
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg", "ica_mo_csf_reg", "ica_mo_csf_wm_reg")
+cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
 
 # Declare reference RSN template ("smith" - Smith, 2009; "yeo" - Yeo, 2011)  
-rsn_template = "smith"
+rsn_template="smith"
 
 if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
-
-
-#---------------------------------------- Read RSNs list from input .txt file ----------------------------------------# 
-#---------------------------------------------------------------------------------------------------------------------# 
-
-# Specify which .txt file containing the rsn names is going to be read 
-if [ $rsn_template == "smith" ]; then
-
-  input_list="list_smith_rsns.txt"
-  
-elif [ $rsn_template == "yeo" ]; then
-
-  input_list="list_yeo_rsns.txt"
-  
-fi
-
-rsn_list=() 
-n=1
-
-# Read specified file line by line and 
-# add rsn name to variable rsn_list
-while read line; do
-
-new_rsn=$(echo "$line") 
-rsn_list=( "${rsn_list[@]}" $new_rsn )
-n=$((n+1))
-
-done < $input_list
 
 
 #--------------------------------------------------- Read dataset settings -------------------------------------------# 
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Create unique temporary directory 
-tmpdir=$(mktemp -d) 
+if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
+tmpdir=$path/tmp
 
 # Read dataset settings
 . settings_dataset.sh

@@ -14,14 +14,10 @@ task="task-rest"         # "task-rest" "task-calib"
 run="run-3"              # "run-1" "run-2" "run-3"
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg", "ica_mo_csf_reg", "ica_mo_csf_wm_reg")
+cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
 
 # Declare reference RSN template ("smith" - Smith, 2009; "yeo" - Yeo, 2011)  
-rsn_template = "smith"
-
-# Declare list of rsns
-rsn_list=("visual_medial" "visual_lateral" "visual_occipital" "dmn" \
-"cerebellum" "motor" "auditory" "executive" "left_fp" "right_fp")
+rsn_template="smith"
 
 if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 

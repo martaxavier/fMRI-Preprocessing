@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# SCRIPT MIGHT HAVE BUGS 
 #This script computes the dice coefficient between subject's ICs 
 #and each of the ICs and each of the 10 RSNs in Smith et al. 2009
 #
@@ -49,26 +50,27 @@ run="run-3"              # "run-1" "run-2" "run-3"
 flag_std_reg=0
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg", "ica_mo_csf_reg", "ica_mo_csf_wm_reg")
+cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
 
 # Declare reference RSN template ("smith" - Smith, 2009; "yeo" - Yeo, 2011)  
-rsn_template = "smith"
+rsn_template ="smith"
 
 if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
  
 # Declare reference image and reference image directory 
-if [[ $rsn_template == "smith" ]]; then
+# Specify which .txt file containing the rsn names is going to be read 
+if [ $rsn_template == "smith" ]; then
 
-  ref=PNAS_Smith09_rsn10
+  input_list="list_smith_rsns.txt"
   ref_dir=STANDARD 
-  bin_thr=3
+  ref=PNAS_Smith09_rsn_bin.nii.gz
+  
+elif [ $rsn_template == "yeo" ]; then
 
-elif [[ $rsn_template == "yeo" ]]; then
-
-  ref=Yeo11_rsn7
+  input_list="list_yeo_rsns.txt"
   ref_dir=STANDARD
-  bin_thr=0.5      # this is already binarized 
-
+  ref=Yeo11_rsn7.nii.gz
+  
 fi
 
 #--------------------------------------------------- Read dataset settings -------------------------------------------# 
@@ -134,9 +136,6 @@ for cleanup in "${cleanup_list[@]}"; do
       --postmat=$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/unwarp/highres2example_func.mat
       
      echo "RSNs registered in functional space for $i"
-      
-      # Binarize (only once for each subject) reference IC maps in the functional space 
-      fslmaths "$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/${ref}_func" -thr $bin_thr -bin "$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/${ref}_func_bin"
     
     fi
     

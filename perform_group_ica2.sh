@@ -35,13 +35,13 @@ pe_dir="y-"              # phase encoding direction
 task="task-rest"         # "task-rest" "task-calib"
 
 # Run list
-run_list=("run-1", "run-2", "run-3") 
+run_list=("run-1" "run-2" "run-3") 
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg", "ica_mo_csf_reg", "ica_mo_csf_wm_reg")
+cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
 
 # Declare reference RSN template ("smith" - Smith, 2009; "yeo" - Yeo, 2011)  
-rsn_template = "smith"
+rsn_template="smith"
 
 if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 
@@ -53,25 +53,16 @@ if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 if [ $rsn_template == "smith" ]; then
 
   input_list="list_smith_rsns.txt"
+  ref_dir=STANDARD 
+  ref=PNAS_Smith09_rsn10.nii.gz
   
 elif [ $rsn_template == "yeo" ]; then
 
   input_list="list_yeo_rsns.txt"
+  ref_dir=STANDARD
+  ref=Yeo11_rsn7.nii.gz
   
 fi
-
-rsn_list=() 
-n=1
-
-# Read specified file line by line and 
-# add rsn name to variable rsn_list
-while read line; do
-
-new_rsn=$(echo "$line") 
-rsn_list=( "${rsn_list[@]}" $new_rsn )
-n=$((n+1))
-
-done < $input_list
 
 
 #--------------------------------------------------- Read dataset settings -------------------------------------------# 
@@ -216,7 +207,8 @@ for cleanup in "${cleanup_list[@]}"; do
       
       # Save file in subjects PREPROCESS directory 
       if [[ ! -d $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir ]]; then mkdir $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir; fi;
-      cp "${i}_dice.txt" $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir
+      if [[ ! -d $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir/$rsn_template ]]; then mkdir $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir/$rsn_template; fi;
+      cp "${i}_dice.txt" $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir/$rsn_template
         
       echo "Computed dice coefficients for subject $i" 
       
