@@ -43,7 +43,7 @@ elif [[ $dataset == "NODDI" ]]; then
   func_data_raw=$i_$task_epi.nii.gz
     
   # Subjects 
-  subj_list=("sub-32" "sub-35" "sub-36" "sub-37" "sub-38" "sub-39" "sub-40" "sub-42" "sub-43" "sub-44" "sub-45" "sub-46" "sub-47" "sub-48" "sub-49" "sub-50") 
+  subj_list=("sub-32" "sub-35" "sub-36" "sub-37" "sub-38" "sub-39" "sub-40" "sub-42" "sub-43" "sub-44" "sub-45" "sub-46" "sub-47" "sub-48" "sub-49" "sub-50")
 
 elif [[ $dataset == "CIBM" ]]; then
 

@@ -17,16 +17,20 @@ if [[ ! -d masks ]]; then
   flirt -in WM_thr -ref example_func -applyxfm -init \
   unwarp/highres2example_func.mat -interp nearestneighbour -out EF_WM_thr
   
+  flirt -in GM_thr -ref example_func -applyxfm -init \
+  unwarp/highres2example_func.mat -interp nearestneighbour -out EF_GM_thr
+  
   # Erode CSF and WM masks 
   fslmaths EF_CSF_thr -kernel gauss 1.8 -ero -bin EF_CSF_ero
   fslmaths EF_WM_thr -kernel gauss 2.2 -ero -bin EF_WM_ero
+  fslmaths EF_GM_thr -kernel gauss 2.2 -ero -bin EF_GM_ero
   
   # Binarize the registered ventricle mask
   fslmaths EF_Ventricle -thr 0.9 -bin EF_Ventricle_bin 
   fslmaths EF_CSF_ero -mas EF_Ventricle_bin EF_CSF_Ventricle
   
   # Save all masks in directory masks
-  mkdir masks; mv -f EF* Ventricle* CSF_thr* WM_thr* masks 
+  mkdir masks; mv -f EF* Ventricle* CSF_thr* WM_thr* GM_thr* masks 
   
 fi
  
@@ -44,7 +48,7 @@ fi
 if [[ $flag_csf == 1 ]]; then cp CSF.txt regressor_csf.txt; fi
 if [[ $flag_wm == 1 ]]; then cp WM.txt regressor_wm.txt; fi
 if [[ $flag_gs == 1 ]]; then cp GS.txt regressor_gs.txt; fi
-if [[ $flag_mo == 1 ]]; then cp mo_confound.txt regressor_mo.txt; fi
+if [[ $flag_mo == 1 ]]; then cp "mo_confound_${mo_metric}.txt" regressor_mo.txt; fi
 
 
 if [[ $flag_rp == 1 ]]; then

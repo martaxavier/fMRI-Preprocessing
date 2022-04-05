@@ -49,7 +49,8 @@
   # Binarize WM and CSF masks from probabilistic maps and copy result to current directory
   fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/${i}_T1_crop_restore_brain_pve_0.nii* -thr 1 CSF_thr.nii.gz
   fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/${i}_T1_crop_restore_brain_pve_2.nii* -thr 1 WM_thr.nii.gz
-
+  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/${i}_T1_crop_restore_brain_pve_1.nii* -thr 1 GM_thr.nii.gz
+    
   # Copy original strucutral image and structural image after bet to current directory
   imcp $path/$dataset/DERIVATIVES/$i/bet_fast/${i}_T1_crop_restore.nii* highres_head.nii.gz
   imcp $path/$dataset/DERIVATIVES/$i/bet_fast/${i}_T1_crop_restore_brain.nii* highres.nii.gz
@@ -158,7 +159,7 @@
   #---------------------------------------------------------------------------------------------------------------------# 
   
   # Use the skull-stripped time-series as input to identify outliers 
-  fsl_motion_outliers -i epi_thresh -o mo_confound.txt --refrms --nomoco
+  fsl_motion_outliers -i epi_thresh -o "mo_confound_${mo_metric}.txt" --$mo_metric --nomoco -m mask
   
   #----------------------------------------- Apply temporal filter to 4D EPI data --------------------------------------#
   #---------------------------------------------------------------------------------------------------------------------# 

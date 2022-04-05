@@ -19,7 +19,7 @@
 #   $subj_fmap_mag: fieldmap magnitude image (one of the two: best looking one)
 #   $subj_fmap_mag_brain: fieldmap magnitude image, brain extracted, BET output 
 #   $subj_fmap_rads: fieldmap image, output of fsl_prepare_fieldmap
-# 
+#
 # Inputs in each DATA/$subj/func directory:
 #   $subj_epi: raw 4D functional data 
 #
@@ -50,6 +50,7 @@
   # Binarize WM and CSF masks from probabilistic maps and copy result to current directory
   fslmaths $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_0.nii* -thr 1 CSF_thr.nii.gz
   fslmaths $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_2.nii* -thr 1 WM_thr.nii.gz
+  fslmaths $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_1.nii* -thr 1 GM_thr.nii.gz
   
   # Copy fieldmap phase and magnitude (before and after bet) images to current directory 
   imcp $path/DERIVATIVES/$i/fmap_prepare/"$i"_fmap_mag.nii* FM_U_fmap_mag.nii.gz
@@ -260,7 +261,7 @@
   #---------------------------------------------------------------------------------------------------------------------# 
   
   # Use the skull-stripped time-series as input to identify outliers 
-  fsl_motion_outliers -i epi_thresh -o mo_confound.txt --refrms --nomoco
+  fsl_motion_outliers -i epi_thresh -o "mo_confound_${mo_metric}.txt" --$mo_metric --nomoco -m mask
   
   
   #----------------------------------------- Apply temporal filter to 4D EPI data --------------------------------------#
