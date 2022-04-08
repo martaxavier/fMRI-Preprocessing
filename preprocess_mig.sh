@@ -261,7 +261,7 @@
   #---------------------------------------------------------------------------------------------------------------------# 
   
   # Use the skull-stripped time-series as input to identify outliers 
-  fsl_motion_outliers -i epi_thresh -o "mo_confound_${mo_metric}.txt" --$mo_metric --nomoco -m mask
+  fsl_motion_outliers -i epi_thresh -o "mo_confound_${mo_metric}.txt" --$mo_metric --nomoco -m mask -s mc/$mo_metric -p mc/$mo_metric
   
   
   #----------------------------------------- Apply temporal filter to 4D EPI data --------------------------------------#

@@ -32,10 +32,11 @@ cd $path
 dataset=NODDI
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
-flag_std_reg=1
+flag_std_reg=0
 
 # Run list
-run_list=("run-1") 
+run_list=("run-1")
+#run_list=("run-1" "run-2" "run-3")
 
 # Cleanup list: 
 #cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
@@ -173,7 +174,7 @@ for cleanup in "${cleanup_list[@]}"; do
   done
   
   # Run melodic, turn off all preprocessing, giving input .txt with path to registered functional data
-  melodic -i "inputlist_4groupICA.txt" -o groupICA --tr=$TR --nobet -a concat -m /usr/local/fsl/data/standard/MNI152_T1_2mm_brain_mask.nii.gz --report --Oall -d 40
+  melodic -i "inputlist_4groupICA.txt" -o groupICA --tr=$TR --nobet -a concat -m /usr/local/fsl/data/standard/MNI152_T1_2mm_brain_mask.nii.gz --report --Oall -d 30
   
   echo "Performed group ICA"
  
@@ -257,5 +258,9 @@ for cleanup in "${cleanup_list[@]}"; do
   mv group* "$gica_dir/$rsn_template"  
   
   cd ..  
+  
+  if [[ ! -d groupICA/$gica_dir ]]; then mkdir groupICA/$gica_dir; fi;
+  if [[ ! -d "groupICA/$gica_dir/$rsn_template" ]]; then mkdir "groupICA/$gica_dir/$rsn_template"; fi;
+  mv -f groupICA/stats groupICA/report groupICA/melo* groupICA/Noise* groupICA/mean* groupICA/mask* groupICA/log* groupICA/eig* groupICA/$gica_dir/$rsn_template
    
 done # cleanups 

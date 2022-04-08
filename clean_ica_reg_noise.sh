@@ -72,15 +72,24 @@ fi
 # Add motion outliers regressors 
 if [[ $flag_mo == 1 ]]; then 
 
-  cp "mo_confound_${mo_metric}.txt" regressor_mo.txt
-  n_cols=$(awk '{print NF}' "mo_confound_${mo_metric}.txt" | sort -nu | head -n 1)
+  # Only if outlier file was created - if not, there are no outliers 
+  if [[ -f "mo_confound_${mo_metric}.txt" ]]; then
+
+    cp "mo_confound_${mo_metric}.txt" regressor_mo.txt
+    n_cols=$(awk '{print NF}' "mo_confound_${mo_metric}.txt" | sort -nu | head -n 1)
+    
+    rend=$(echo "$r + $n_cols" | bc -l)
+    while [ $r -le $rend ]; do
+      r=$(echo "$r + 1" | bc -l)
+      reg_out=( "${reg_out[@]}" "$r" )
+    done
+    r=$rend
   
-  rend=$(echo "$r + $n_cols" | bc -l)
-  while [ $r -le $rend ]; do
-    r=$(echo "$r + 1" | bc -l)
-    reg_out=( "${reg_out[@]}" "$r" )
-  done
-  r=$rend
+  else
+  
+    echo "Warning: there are no motion outliers for subject $i"
+  
+  fi
 
 fi
 
@@ -89,32 +98,32 @@ if [[ $flag_rp == 1 ]]; then
 
   if [[ $flag_hpf == 0 ]]; then 
   
-    # Define input and output data files 
-    data=prefiltered_func_data_mcf.txt
-    data_out=prefiltered_func_data_mcf_tempfilt.txt
-    if [[ -f $data_out ]]; then rm $data_out; fi
-    
-    # High-pass filter the 6 realignment parameters  
-    . $path/perform_temporal_hpf_motionpars.sh 
-    
-    echo "Temporal high-pass of motion realignment parameters done for subject $i" 
-
-    if [[ $flag_rp_exp == 1 ]]; then
-    
-      # Define input and output data files 
-      data=$data_out
-      data_out=prefiltered_func_data_mcf_exp_tempfilt.txt
-      if [[ -f $data_out ]]; then rm $data_out; fi
-      
-      # Compute the time-series expansions of the realignment parameters 
-      ${path}motionpars_expansions.sh $data $data_out
-      mv prefiltered_func_data_mcf_exp_tempfilt.dat prefiltered_func_data_mcf_exp_tempfilt.txt
-      
-      echo "Time-series expansions of motion realignment parameters computed for subject $i"  
-    
-    fi  # flag_rp_exp == 1
+   # Define input and output data files 
+   data=prefiltered_func_data_mcf.txt
+   data_out=prefiltered_func_data_mcf_tempfilt.txt
+   if [[ -f $data_out ]]; then rm $data_out; fi
    
-  else # flag_hpf == 1
+     # High-pass filter the 6 realignment parameters  
+     . $path/perform_temporal_hpf_motionpars.sh 
+   
+     echo "Temporal high-pass of motion realignment parameters done for subject $i" 
+ 
+     if [[ $flag_rp_exp == 1 ]]; then
+     
+       # Define input and output data files 
+       data=$data_out
+       data_out=prefiltered_func_data_mcf_exp_tempfilt.txt
+       if [[ -f $data_out ]]; then rm $data_out; fi
+       
+       # Compute the time-series expansions of the realignment parameters 
+       ${path}motionpars_expansions.sh $data $data_out
+       mv prefiltered_func_data_mcf_exp_tempfilt.dat prefiltered_func_data_mcf_exp_tempfilt.txt
+       
+       echo "Time-series expansions of motion realignment parameters computed for subject $i"  
+     
+     fi  # flag_rp_exp == 1
+   
+  else # flag_hpf == 0
   
    data_out=prefiltered_func_data_mcf.txt
    if [[ -f $data_out ]]; then rm $data_out; fi
@@ -132,7 +141,7 @@ if [[ $flag_rp == 1 ]]; then
       
       echo "Time-series expansions of motion realignment parameters computed for subject $i"    
     
-    fi # flag_rp_exp == 1
+   fi # flag_rp_exp == 1
   
   fi  # flag_hfp
   
@@ -190,7 +199,6 @@ noise_ics=($(echo ${noise_ics[@]} | tr " " ","))
 if [ "$noise_ics" == "" ]; then
   
   echo "Warning: there are no noise ICs in ${fix_txt_out} for subject $i"
-  
   
   # Perform nonaggressive regression of IC-N and nuisance regressors 
   fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design.txt -f "$reg_out" 

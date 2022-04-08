@@ -48,7 +48,13 @@ fi
 if [[ $flag_csf == 1 ]]; then cp CSF.txt regressor_csf.txt; fi
 if [[ $flag_wm == 1 ]]; then cp WM.txt regressor_wm.txt; fi
 if [[ $flag_gs == 1 ]]; then cp GS.txt regressor_gs.txt; fi
-if [[ $flag_mo == 1 ]]; then cp "mo_confound_${mo_metric}.txt" regressor_mo.txt; fi
+if [[ $flag_mo == 1 ]]; then 
+  if [[ -f "mo_confound_${mo_metric}.txt" ]]; then
+    cp "mo_confound_${mo_metric}.txt" regressor_mo.txt
+  else
+    echo "Warning: there are no motion outliers for subject $i"
+  fi
+fi
 
 
 if [[ $flag_rp == 1 ]]; then

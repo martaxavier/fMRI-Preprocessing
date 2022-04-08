@@ -17,13 +17,20 @@ tmpdir=$(mktemp -d)
 read subj_list < $tmpdir/subj_list.txt 
 read anat_data_raw < $tmpdir/anat_data_raw.txt 
 
+
 # Iterate through subjects 
 for i in "${subj_list[@]}"; do  
+  
+  if [[ $dataset == "PARIS" ]]; then
+    anat_data_raw_sub=${i}_${anat_data_raw}
+  elif [[ $dataset == "NODDI" ]]; then
+    anat_data_raw_sub=${i}_${anat_data_raw}
+  fi
 
   cd PARIS/DATA/$i/anat
   
   # Reorient to standard orientation 
-  fslreorient2std $anat_data_raw ${i}_T1_reori
+  fslreorient2std $anat_data_raw_sub ${i}_T1_reori
   
   # Crop to remove head and lower neck 
   # This helps ANTS automatic brain extraction 

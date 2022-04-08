@@ -30,15 +30,16 @@ cd $path
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Declare analysis settings 
-dataset=PARIS
+dataset=NODDI
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
 
 # Run list
-run_list=("run-1" "run-2" "run-3") 
+#run_list=("run-1" "run-2" "run-3") 
+run_list=("run-1")
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
+cleanup_list=("ica_mo_csf_wm_reg")
 
 # Declare reference RSN template ("smith" - Smith, 2009; "yeo" - Yeo, 2011)  
 rsn_template="smith"
@@ -117,7 +118,7 @@ for cleanup in "${cleanup_list[@]}"; do
   cd $dataset/PREPROCESS 
   
   # Perform dual regression, turn on variance normalisation of the timecourses used as stage-2 regressors 
-  dual_regression groupICA/melodic_IC 1 -1 0 groupICA.dr `cat inputlist_4groupICA.txt`
+  dual_regression groupICA/$gica_dir/$rsn_template/melodic_IC 1 -1 0 groupICA.dr `cat inputlist_4groupICA.txt`
   
   echo "Performed dual regression"
 
@@ -225,20 +226,14 @@ for cleanup in "${cleanup_list[@]}"; do
     
   done # runs 
   
-  # Move all group ICA files to current analysis directory 
-  if [[ ! -d groupICA/$gica_dir ]]; then mkdir groupICA/$gica_dir; fi;
-  mv groupICA/* groupICA/$gica_dir
-  mv groupICA/$gica_dir/mel* groupICA
-  
   # Move all dual regression files to current analysis directory 
   if [[ ! -d groupICA.dr/$gica_dir ]]; then mkdir groupICA.dr/$gica_dir; fi;
-  mv groupICA.dr/* groupICA.dr/$gica_dir
-  mv groupICA.dr/$gica_dir/mel* groupICA.dr
+  if [[ ! -d groupICA.dr/$gica_dir/$rsn_template ]]; then mkdir groupICA.dr/$gica_dir/$rsn_template; fi;
+  mv -f groupICA.dr/mas* groupICA.dr/dr* groupICA.dr/script* groupICA.dr/$gica_dir/$rsn_template
     
   cd groupICA.stats; rm STD00*
   
   # Move all files to analysis directory 
-  if [[ ! -d $gica_dir ]]; then mkdir $gica_dir; fi;
-  mv sub* $gica_dir
+  mv sub* $gica_dir/$rsn_template
   
 done # cleanup

@@ -85,10 +85,10 @@ cd $path
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Declare analysis settings 
-dataset=NODDI
+dataset=PARIS
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
-run="run-1"              # "run-1" "run-2" "run-3"
+run="run-3"              # "run-1" "run-2" "run-3"
 mo_metric="dvars"
 flag_std_reg=0
 

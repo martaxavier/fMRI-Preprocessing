@@ -3,14 +3,12 @@
 if [ $# -lt 2 ] ; then
     cat << EOF
 Usage: mp_diffpow24 regparam.dat diffregparam.dat
-
 Creates file with 24 columns; the first 6 are the motion
 parameters, the next 6 are the square of the motion
 parameters, the next 6 are the temporal difference of motion parameters, 
 and the next 6 are the square of the differenced values.  This is useful for
 accounting for 'spin history' effects, and variation not 
 otherwise accounted for by motion correction.
-
 \$Id: mp_diffpow24.sh,v 1.1 2012/10/26 11:29:29 nichols Exp $
 EOF
     exit 1
@@ -33,4 +31,4 @@ cat <<EOF > /tmp/$$-mp-diffpow
 EOF
 awk -f /tmp/$$-mp-diffpow "$1" > ${f}.dat
 
-/bin/rm /tmp/$$-mp-diffpow
+/bin/rm /tmp/$$-mp-diffpow 

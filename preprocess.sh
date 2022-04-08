@@ -56,7 +56,7 @@
   imcp $path/$dataset/DERIVATIVES/$i/bet_fast/${i}_T1_crop_restore_brain.nii* highres.nii.gz
   
   # Copy functional data to current directory
-  cp $path/$dataset/DATA/$i/func/$func_data_raw epi.nii.gz
+  cp $path/$dataset/DATA/$i/func/$func_data_raw_sub epi.nii.gz
   
   # Copy registration files
   if [[ ! -d unwarp ]]; then mkdir unwarp; fi; cp $path/$dataset/DERIVATIVES/$i/reg/* unwarp
@@ -68,7 +68,7 @@
     rm vol0000.nii.gz vol0001.nii.gz vol0002.nii.gz vol0003.nii.gz vol0004.nii.gz
     fslmerge -t epi vol*
     rm vol*
-  else   
+  fi   
 
   # Extract example volume from middle volume
   n_vols=$(fslval epi dim4) 
@@ -97,26 +97,24 @@
   
   # Use MCFLIRT to estimate 6 realignment parameters (RP)
   # and correct distorted functional image for motion artefacts
-  mcflirt -in epi -out epi_mcf -mats -plots -reffile \
-  example_func -rmsrel -rmsabs -spline_final
+  mcflirt -in epi -out epi_mcf -mats -plots -reffile example_func -rmsrel -rmsabs -spline_final
   
   # Create and organize mc directory - contains all motion parameters 
-  mkdir -p mc ; mv -f epi_mcf.mat epi_mcf.par epi_mcf_abs.rms\
-   epi_mcf_abs_mean.rms epi_mcf_rel.rms epi_mcf_rel_mean.rms mc
+  mkdir -p mc ; mv -f epi_mcf.mat epi_mcf.par epi_mcf_abs.rms epi_mcf_abs_mean.rms epi_mcf_rel.rms epi_mcf_rel_mean.rms mc
   
   # Create plots of realignment parameters throughout time
+  cd mc
+  
   # MCFLIRT estimated rotations in mm (three)
-  cd mc; fsl_tsplot -i epi_mcf.par -t 'MCFLIRT estimated rotations (radians)' \
-  -u 1 --start=1 --finish=3 -a x,y,z -w 640 -h 144 -o rot.png
+  fsl_tsplot -i epi_mcf.par -t 'MCFLIRT estimated rotations (radians)' -u 1 --start=1 --finish=3 -a x,y,z -w 640 -h 144 -o rot.png
   
   # MCFLIRT estimated translations in mm (three)
-  fsl_tsplot -i epi_mcf.par -t 'MCFLIRT estimated translations (mm)' \
-  -u 1 --start=4 --finish=6 -a x,y,z -w 640 -h 144 -o trans.png 
+  fsl_tsplot -i epi_mcf.par -t 'MCFLIRT estimated translations (mm)' -u 1 --start=4 --finish=6 -a x,y,z -w 640 -h 144 -o trans.png 
   
   # MCFLIRT estimated mean displacement in mm 
-  fsl_tsplot -i epi_mcf_abs.rms,epi_mcf_rel.rms \
-  -t 'MCFLIRT estimated mean displacement (mm)' \
-  -u 1 -w 640 -h 144 -a absolute,relative -o disp.png; cd .. 
+  fsl_tsplot -i epi_mcf_abs.rms,epi_mcf_rel.rms -t 'MCFLIRT estimated mean displacement (mm)' -u 1 -w 640 -h 144 -a absolute,relative -o disp.png
+  
+  cd .. 
   
   # Concatenate all 6 estimated realignment parameters in epi_mcf.cat
   cat mc/epi_mcf.mat/MAT* > mc/epi_mcf.cat 
@@ -125,11 +123,6 @@
   cp mc/epi_mcf.par prefiltered_func_data_mcf.par
   mv prefiltered_func_data_mcf.par prefiltered_func_data_mcf.txt
   
-  #awk '{print $1}' prefiltered_func_data_mcf.txt >> rp_1.txt;awk '{print $2}' prefiltered_func_data_mcf.txt >> rp_2.txt
-  #awk '{print $3}' prefiltered_func_data_mcf.txt >> rp_3.txt;awk '{print $4}' prefiltered_func_data_mcf.txt >> rp_4.txt
-  #awk '{print $5}' prefiltered_func_data_mcf.txt >> rp_5.txt;awk '{print $6}' prefiltered_func_data_mcf.txt >> rp_6.txt 
-  #rm prefiltered_func_data_mcf.txt; paste rp* | column -s $'\t' -t >> prefiltered_func_data_mcf.txt; rm rp*
-
     
   #----------------------------- Brain extraction of 4D data and processing of brian mask  -----------------------------#
   #---------------------------------------------------------------------------------------------------------------------# 
@@ -159,7 +152,8 @@
   #---------------------------------------------------------------------------------------------------------------------# 
   
   # Use the skull-stripped time-series as input to identify outliers 
-  fsl_motion_outliers -i epi_thresh -o "mo_confound_${mo_metric}.txt" --$mo_metric --nomoco -m mask
+  # The output file will not be created if there are no outliers 
+  fsl_motion_outliers -i epi_thresh -o "mo_confound_${mo_metric}.txt" --$mo_metric --nomoco -m mask -s mc/"${mo_metric}.txt" -p mc/$mo_metric
   
   #----------------------------------------- Apply temporal filter to 4D EPI data --------------------------------------#
   #---------------------------------------------------------------------------------------------------------------------# 

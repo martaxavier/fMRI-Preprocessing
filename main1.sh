@@ -71,7 +71,7 @@ pe_dir="y-"              # phase encoding direction
 task="task-rest"         # "task-rest" "task-calib"
 run="run-3"              # "run-1" "run-2" "run-3"
 
-path=/home/mxavier/eeg-fmri
+path=/home/mxavier/eeg-fmri/
 cd $path
 
 
@@ -79,7 +79,7 @@ cd $path
 #---------------------------------------------------------------------------------------------------------------------# 
 
 if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
-tmpdir=$path/tmp
+tmpdir=${path}tmp
 
 # Read dataset settings
 . settings_dataset.sh
@@ -102,6 +102,8 @@ if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 # Iterate through subjects 
 for i in "${subj_list[@]}"; do  
 
+  func_data_raw_sub=${i}_${func_data_raw}
+  
   if [[ ! -d $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir ]]
     then 
       mkdir $path/$dataset/PREPROCESS/$i
