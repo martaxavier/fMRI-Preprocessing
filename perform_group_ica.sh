@@ -29,18 +29,18 @@ cd $path
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Declare analysis settings 
-dataset=NODDI
+dataset=PARIS
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
 flag_std_reg=0
 
 # Run list
-run_list=("run-1")
-#run_list=("run-1" "run-2" "run-3")
+#run_list=("run-1")
+run_list=("run-1" "run-2" "run-3")
 
 # Cleanup list: 
-#cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
-cleanup_list=("ica_mo_csf_wm_reg")
+cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
+#cleanup_list=("ica_mo_csf_wm_reg")
 
 # Declare reference RSN template ("smith" - Smith, 2009; "yeo" - Yeo, 2011)  
 rsn_template="smith"
