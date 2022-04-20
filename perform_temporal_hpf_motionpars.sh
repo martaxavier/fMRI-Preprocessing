@@ -3,7 +3,7 @@
 #This script performs temporal high-pass filtering of the input regressors
 
 # Create unique directory for temporary files 
-if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
+if find ${path}/tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}/tmp/*; fi
 tmpdir=$path/tmp
 
 # define exit trap

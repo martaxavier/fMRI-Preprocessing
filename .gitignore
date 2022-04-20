@@ -1,0 +1,5 @@
+# Ignore node_modules folder
+MIGN2TREAT
+
+# Ignore all text files
+.nfs*

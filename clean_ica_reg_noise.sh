@@ -10,8 +10,9 @@ cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
 
 # Build csf and wm masks if they don't already exist for the current subject 
 if [[ ! -d masks ]]; then
+  echo "Building masks for $i"
   
-  # Co-register CSF and WM masks into functional space
+  # Co-register CSF, WM and GM masks into functional space
   flirt -in CSF_thr -ref example_func -applyxfm -init \
   unwarp/highres2example_func.mat -interp nearestneighbour -out EF_CSF_thr
   
@@ -21,7 +22,7 @@ if [[ ! -d masks ]]; then
   flirt -in GM_thr -ref example_func -applyxfm -init \
   unwarp/highres2example_func.mat -interp nearestneighbour -out EF_GM_thr
   
-  # Erode CSF and WM masks 
+  # Erode CSF, WM and GM masks 
   fslmaths EF_CSF_thr -kernel gauss 1.8 -ero -bin EF_CSF_ero
   fslmaths EF_WM_thr -kernel gauss 2.2 -ero -bin EF_WM_ero
   fslmaths EF_GM_thr -kernel gauss 2.2 -ero -bin EF_GM_ero
@@ -35,8 +36,10 @@ if [[ ! -d masks ]]; then
   
 fi
  
+ ls masks
+ 
  # Compute nuisance signals of GS, CSF and WM signals 
- fslmeants -i $func_data_in -o GS_before_ica_cleanup.txt -m mask 
+ fslmeants -i $func_data_in -m mask -o GS_before_ica_cleanup.txt  
  fslmeants -i $func_data_in -m masks/EF_CSF_Ventricle -o CSF_before_ica_cleanup.txt
  fslmeants -i $func_data_in -m masks/EF_WM_ero -o WM_before_ica_cleanup.txt
  
@@ -116,7 +119,7 @@ if [[ $flag_rp == 1 ]]; then
        if [[ -f $data_out ]]; then rm $data_out; fi
        
        # Compute the time-series expansions of the realignment parameters 
-       ${path}motionpars_expansions.sh $data $data_out
+       ${path}/motionpars_expansions.sh $data $data_out
        mv prefiltered_func_data_mcf_exp_tempfilt.dat prefiltered_func_data_mcf_exp_tempfilt.txt
        
        echo "Time-series expansions of motion realignment parameters computed for subject $i"  
@@ -136,7 +139,7 @@ if [[ $flag_rp == 1 ]]; then
       if [[ -f $data_out ]]; then rm $data_out; fi
       
       # Compute the time-series expansions of the realignment parameters   
-      ${path}motionpars_expansions.sh $data $data_out
+      ${path}/motionpars_expansions.sh $data $data_out
       mv prefiltered_func_data_mcf_exp.dat prefiltered_func_data_mcf_exp.txt
       
       echo "Time-series expansions of motion realignment parameters computed for subject $i"    

@@ -128,12 +128,12 @@ for cleanup in "${cleanup_list[@]}"; do
  
     cd $path
   
-    if [[ ! -f "$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/${ref}_func.nii.gz" ]]; then
+    if [[ ! -f "$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/${ref}_func.nii.gz" ]]; then
  
       # Register (only once for each subject) Smiths/Yeos RSNs in subject's functional space     
-      applywarp --in=$ref_dir/$ref --ref=$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/example_func \
-      --out="$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/${ref}_func" --warp=$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/unwarp/standard2highres_coef.nii.gz \
-      --postmat=$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/unwarp/highres2example_func.mat
+      applywarp --in=$ref_dir/$ref --ref=$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/example_func \
+      --out="$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/${ref}_func" --warp=$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/unwarp/standard2highres_coef.nii.gz \
+      --postmat=$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/unwarp/highres2example_func.mat
       
      echo "RSNs registered in functional space for $i"
     
@@ -143,8 +143,8 @@ for cleanup in "${cleanup_list[@]}"; do
    #-------------------------------------------------------------------------------------------------------------------# 
    
     cd $dataset/PREPROCESS    
-    cp "$task/$i/$run/$pedir_dir/${ref}_func_bin"* $task/$i/$run/$pedir_dir/$mel_dir
-    cd $task/$i/$run/$pedir_dir/$mel_dir
+    cp "$i/$task/$run/$pedir_dir/${ref}_func_bin"* $i/$task/$run/$pedir_dir/$mel_dir
+    cd $i/$task/$run/$pedir_dir/$mel_dir
     
     # Split binarized reference IC maps into separate images 
     fslsplit "${ref}_func_bin" STD  

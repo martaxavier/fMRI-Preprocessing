@@ -96,11 +96,11 @@ for cleanup in "${cleanup_list[@]}"; do
    fi
  
    # Change to subjects directory
-   cd $path/$dataset/PREPROCESS/$task
-   cp "groupICA.dr/$gica_dir/dr_stage2_subject000${sub}_Z.nii.gz" $task/$i/$pedir_dir/$gica_dir
-   cp groupICA.dr/$gica_dir/dr_stage2_subject000${sub}.nii.gz $task/$i/$pedir_dir/$gica_dir
-   cp groupICA.dr/$gica_dir/dr_stage1_subject000${sub}.txt $task/$i/$pedir_dir/$gica_dir
-   cp groupICA.stats/$gica_dir/"${i}_dice.txt" $task/$i/$pedir_dir/$gica_dir
+   cd $path/$dataset/PREPROCESS/
+   cp "groupICA.dr/$gica_dir/dr_stage2_subject000${sub}_Z.nii.gz" $i/$task/$pedir_dir/$gica_dir
+   cp groupICA.dr/$gica_dir/dr_stage2_subject000${sub}.nii.gz $i/$task/$pedir_dir/$gica_dir
+   cp groupICA.dr/$gica_dir/dr_stage1_subject000${sub}.txt $i/$task/$pedir_dir/$gica_dir
+   cp groupICA.stats/$gica_dir/"${i}_dice.txt" $i/$task/$pedir_dir/$gica_dir
    
    #------------------------------------------- Extract IC time-course from -------------------------------------------# 
    #------------------------------------------------ dr_stage2 txt file -----------------------------------------------# 
@@ -109,7 +109,7 @@ for cleanup in "${cleanup_list[@]}"; do
    
    for j in "${rsn_list[@]}"; do 
    
-     rm $task/$i/$pedir_dir/$gica_dir/ic_${j}_group.txt
+     rm $i/$task/$pedir_dir/$gica_dir/ic_${j}_group.txt
      
      # Find maximum dice for current network 
      line=$(sed "${rsn}q;d" groupICA.stats/$gica_dir/group_dice.txt)
@@ -122,7 +122,7 @@ for cleanup in "${cleanup_list[@]}"; do
      done 
      
      maxidx=$(echo "$maxidx + 1" | bc -l) 
-     awk '{print $'$maxidx'}' groupICA.dr/$gica_dir/dr_stage1_subject000${sub}.txt > $task/$i/$pedir_dir/$gica_dir/ic_${j}_group.txt
+     awk '{print $'$maxidx'}' groupICA.dr/$gica_dir/dr_stage1_subject000${sub}.txt > $i/$task/$pedir_dir/$gica_dir/ic_${j}_group.txt
    
      # Update rsn number 
      rsn=$(echo "$rsn + 1" | bc -l)

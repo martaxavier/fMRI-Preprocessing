@@ -69,9 +69,9 @@
 # Declare some initial parameters 
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
-run="run-3"              # "run-1" "run-2" "run-3"
+run="ses-midcycle"              # "run-1" "run-2" "run-3"
 
-path=/home/mxavier/eeg-fmri/
+path=/home/iesteves/eeg-fmri/
 cd $path
 
 
@@ -106,7 +106,7 @@ for i in "${subj_list[@]}"; do
   
   if [[ ! -d $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir ]]
     then 
-      mkdir $path/$dataset/PREPROCESS/$i
+      mkdir $path/$dataset/PREPROCESS/$task
       mkdir $path/$dataset/PREPROCESS/$task/$i 
       mkdir $path/$dataset/PREPROCESS/$task/$i/$run
       mkdir $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir

@@ -48,24 +48,24 @@
 #---------------------------------------------------------------------------------------------------------------------# 
   
   # Binarize WM and CSF masks from probabilistic maps and copy result to current directory
-  fslmaths $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_0.nii* -thr 1 CSF_thr.nii.gz
-  fslmaths $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_2.nii* -thr 1 WM_thr.nii.gz
-  fslmaths $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_1.nii* -thr 1 GM_thr.nii.gz
+  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_0.nii* -thr 1 CSF_thr.nii.gz
+  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_2.nii* -thr 1 WM_thr.nii.gz
+  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_1.nii* -thr 1 GM_thr.nii.gz
   
   # Copy fieldmap phase and magnitude (before and after bet) images to current directory 
-  imcp $path/DERIVATIVES/$i/fmap_prepare/"$i"_fmap_mag.nii* FM_U_fmap_mag.nii.gz
-  imcp $path/DERIVATIVES/$i/fmap_prepare/"$i"_fmap_mag_brain.nii* FM_U_fmap_mag_brain.nii.gz
-  imcp $path/DERIVATIVES/$i/fmap_prepare/"$i"_fmap_rads.nii* FM_U_fmap.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/$run/fmap_prepare/"$i"_"$run"_fmap_mag.nii* FM_U_fmap_mag.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/$run/fmap_prepare/"$i"_"$run"_fmap_mag_brain.nii* FM_U_fmap_mag_brain.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/$run/fmap_prepare/"$i"_"$run"_fmap_rads.nii* FM_U_fmap.nii.gz
   
   # Copy original strucutral image and structural image after bet to current directory
-  imcp $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE.nii* highres_head.nii.gz
-  imcp $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain.nii* highres.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE.nii* highres_head.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain.nii* highres.nii.gz
     
   # Copy registration coefficients from highres to standard space
-  imcp $path/DERIVATIVES/$i/fnirt_reg2standard/reg_nonlinear_coef_T1tostandard_2mm.nii.gz highres2standard_coef.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/fnirt_reg2standard/reg_nonlinear_coef_T1tostandard_2mm.nii.gz highres2standard_coef.nii.gz
   
   # Copy functional data to current directory
-  imcp $path/DATA/$i/func/"$i"_"$task"_epi.nii* epi.nii.gz
+  imcp $path/$dataset/DATA/$i/$run/func/"$i"_"$run"_"$task"_epi.nii* epi.nii.gz
 
   # Extract example volume from middle volume
   n_vols=$(fslval epi dim4) 

@@ -121,7 +121,7 @@ for cleanup in "${cleanup_list[@]}"; do
                              
    for i in "${subj_list[@]}"; do 
  
-     subj_dir=$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
+     subj_dir=$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
      cd $path/$subj_dir
      if [[ ! -d "rsns" ]]; then mkdir "rsns"; fi; 
      

@@ -115,7 +115,7 @@ for cleanup in "${cleanup_list[@]}"; do
   #---------------------------------------------- Run dual regression ------------------------------------------------# 
   #-------------------------------------------------------------------------------------------------------------------#  
   
-  cd $dataset/PREPROCESS/$task 
+  cd $dataset/PREPROCESS 
   
   # Perform dual regression, turn on variance normalisation of the timecourses used as stage-2 regressors 
   dual_regression groupICA/$gica_dir/$rsn_template/melodic_IC 1 -1 0 groupICA.dr `cat inputlist_4groupICA.txt`
@@ -207,9 +207,9 @@ for cleanup in "${cleanup_list[@]}"; do
       paste dice* | column -s $'\t' -t >> "${i}_dice.txt"
       
       # Save file in subjects PREPROCESS directory 
-      if [[ ! -d $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/$gica_dir ]]; then mkdir $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/$gica_dir; fi;
-      if [[ ! -d $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/$gica_dir/$rsn_template ]]; then mkdir $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/$gica_dir/$rsn_template; fi;
-      cp "${i}_dice.txt" $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/$gica_dir/$rsn_template
+      if [[ ! -d $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir ]]; then mkdir $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir; fi;
+      if [[ ! -d $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir/$rsn_template ]]; then mkdir $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir/$rsn_template; fi;
+      cp "${i}_dice.txt" $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/$gica_dir/$rsn_template
         
       echo "Computed dice coefficients for subject $i" 
       

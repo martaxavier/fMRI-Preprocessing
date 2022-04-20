@@ -7,13 +7,18 @@ if [[ $dataset == "MIGN2TREAT" ]]; then
 
   TR=1.26                  # seconds 
   echo_spacing=0.00031     # seconds 
-  hp_freq=0.01             # Hz 
+  hp_freq=0.01             # Hz
+  fwhm=3.3                 # FWHM, mm  
   pe_dir="y-"              # phase encoding direction 
   fix_thr="20"             # fix noise/signal threshold 
-  fix_train_data=""        # fix dataset
-  fix_txt_out=""           # fix output file 
-  anat_data_raw=""         
-  func_data_raw=""
+  fix_train_data="WhII_MB6.RData"        # fix dataset
+  fix_txt_out="fix4melview_WhII_MB6_thr20.txt"           # fix output file 
+  anat_data_raw=_MPRAGE.nii.gz         
+  func_data_raw=${run}_${task}_acq-ep2d_p2_s3_bold.nii
+  
+  # Subjects
+  #subj_list=("sub-control019" "sub-control020" "sub-control025" "sub-control026" "sub-control027" "sub-control029" "sub-control030" "sub-control031" "sub-control033" "sub-control044" "sub-control046")
+  subj_list=("sub-control046")
 
 elif [[ $dataset == "PARIS" ]]; then
 

@@ -77,7 +77,7 @@
 #    filtered_func_data_preprocessed_ica_mo_csf_reg: functional data after ica + nonagressive regression of N-IC, RP, MO and CSF time-series
 #    filtered_func_data_preprocessed_ica_mo_csf_wm_reg: functional data after ica + nonagressive regression of N-IC, RP, MO, CSF and WM time-series
 
-path=/home/mxavier/eeg-fmri/
+path=/home/iesteves/eeg-fmri
 cd $path
 
 
@@ -85,15 +85,16 @@ cd $path
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Declare analysis settings 
-dataset=PARIS
+dataset=MIGN2TREAT
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
-run="run-3"              # "run-1" "run-2" "run-3"
+run="ses-premenstrual"              # "run-1" "run-2" "run-3"
 mo_metric="dvars"
 flag_std_reg=0
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
+#cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
+cleanup_list=("ica_mo_csf_wm_reg")
 
 if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 
@@ -101,7 +102,7 @@ if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Create unique temporary directory 
-if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
+if find ${path}/tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}/tmp/*; fi
 tmpdir=$path/tmp
 
 # Define exit trap
@@ -148,8 +149,8 @@ if [[ $flag_std_reg == 1 ]]; then
     invwarp --ref=highres --warp=highres2standard_coef --out=standard2highres_coef  
 
     # Create linear and non-linear warp transformation from functional to standard space 
-    convert_xfm -omat example_func2standard_aff.mat -concat unwarp/highres2standard_aff.mat unwarp/example_func2highres.mat
-    convertwarp --ref=standard --premat=unwarp/example_func2highres.mat --warp1=unwarp/highres2standard_coef --out=example_func2standard_coef
+    convert_xfm -omat example_func2standard_aff.mat -concat highres2standard_aff.mat unwarp/example_func2highres.mat
+    convertwarp --ref=standard --premat=unwarp/example_func2highres.mat --warp1=highres2standard_coef --out=example_func2standard_coef
     
     # Use the transformation to register the functional image to standard space
     applywarp --ref=standard --in=example_func --out=example_func2standard --warp=example_func2standard_coef
@@ -165,7 +166,7 @@ if [[ $flag_std_reg == 1 ]]; then
     rm LVentricle* RVentricle* 
   
     # Register the ventrical mask to current subject's structural space
-    applywarp --in=Ventricle --ref=highres --out=H_Ventricle --warp=unwarp/standard2highres_coef
+    applywarp --in=Ventricle --ref=highres --out=H_Ventricle --warp=standard2highres_coef
     
     # Register the ventrical mask to current subject's functional space 
     applywarp --in=Ventricle --ref=example_func --out=EF_Ventricle --warp=standard2example_func_coef

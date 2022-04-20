@@ -100,7 +100,7 @@ for cleanup in "${cleanup_list[@]}"; do
   for i in "${subj_list[@]}"; do 
    
     # Change to current subjects directory                                                                
-    cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
+    cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
     
     
     #---------------------------------------- Perform ICA to preprocessed func data ------------------------------------#

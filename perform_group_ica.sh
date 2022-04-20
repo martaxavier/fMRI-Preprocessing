@@ -22,7 +22,7 @@
 #    nocleanup: none 
 
 
-path=/home/mxavier/eeg-fmri/
+path=/home/iesteves/eeg-fmri/
 cd $path
 
 #--------------------------------------------- Declare analysis settings ---------------------------------------------# 
@@ -33,8 +33,6 @@ dataset=PARIS
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
 flag_std_reg=0
-n_group_ics=30           # 30 for NODDI, 40 for PARIS and CIBM 
-auto_n_group_ics=0       # automatic estimation of the number of group ICs 
 
 # Run list
 #run_list=("run-1")
@@ -83,8 +81,8 @@ read TR < $tmpdir/TR.txt
 
 
 # Create output directories 
-if [[ ! -d $dataset/PREPROCESS/$task/groupICA ]]; then mkdir $dataset/PREPROCESS/$task/groupICA; fi;
-if [[ ! -d $dataset/PREPROCESS/$task/groupICA.stats ]]; then mkdir $dataset/PREPROCESS/$task/groupICA.stats; fi;
+if [[ ! -d $dataset/PREPROCESS/groupICA ]]; then mkdir $dataset/PREPROCESS/groupICA; fi;
+if [[ ! -d $dataset/PREPROCESS/groupICA.stats ]]; then mkdir $dataset/PREPROCESS/groupICA.stats; fi;
 
 
 #------------------------------------------------- Assign RSN list  --------------------------------------------------# 
@@ -138,7 +136,7 @@ for cleanup in "${cleanup_list[@]}"; do
          if [[ $run == "run-3" ]] && [[ $i == "sub-28" ]]; then continue; fi
        
          # Go to current subject directory
-         cd "$path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir"
+         cd "$path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir"
          
          # Apply warp to obtain filtered_func_data_preprocessed in standard space 
          applywarp --in=$func_data --ref=/usr/local/fsl/data/standard/MNI152_T1_2mm_brain \
@@ -156,7 +154,7 @@ for cleanup in "${cleanup_list[@]}"; do
   #------------------------- Run group ICA using MELODIC multi-session temporal concatenation ------------------------# 
   #-------------------------------------------------------------------------------------------------------------------# 
   
-  cd $path/$dataset/PREPROCESS/$task
+  cd $path/$dataset/PREPROCESS
   
   # Write input list for melodic ica 
   rm inputlist_4groupICA.txt
@@ -169,19 +167,14 @@ for cleanup in "${cleanup_list[@]}"; do
       if [[ $run == "run-3" ]] && [[ $i == "sub-03" ]]; then continue; fi
       if [[ $run == "run-3" ]] && [[ $i == "sub-28" ]]; then continue; fi
          
-      echo $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/${func_data}2standard >> inputlist_4groupICA.txt
+      echo $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/${func_data}2standard >> inputlist_4groupICA.txt
       
     done
   
   done
   
   # Run melodic, turn off all preprocessing, giving input .txt with path to registered functional data
-  if [[ $auto_n_group_ics == 0 ]]
-  then 
-      melodic -i "inputlist_4groupICA.txt" -o groupICA --tr=$TR --nobet -a concat -m /usr/local/fsl/data/standard/MNI152_T1_2mm_brain_mask.nii.gz --report --Oall -d $n_group_ics
-  else
-      melodic -i "inputlist_4groupICA.txt" -o groupICA --tr=$TR --nobet -a concat -m /usr/local/fsl/data/standard/MNI152_T1_2mm_brain_mask.nii.gz --report --Oall
-  fi
+  melodic -i "inputlist_4groupICA.txt" -o groupICA --tr=$TR --nobet -a concat -m /usr/local/fsl/data/standard/MNI152_T1_2mm_brain_mask.nii.gz --report --Oall -d 30
   
   echo "Performed group ICA"
  
