@@ -33,6 +33,8 @@ dataset=PARIS
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
 flag_std_reg=0
+n_group_ics=30           # 30 for NODDI, 40 for PARIS and CIBM 
+auto_n_group_ics=0       # automatic estimation of the number of group ICs 
 
 # Run list
 #run_list=("run-1")
@@ -174,7 +176,12 @@ for cleanup in "${cleanup_list[@]}"; do
   done
   
   # Run melodic, turn off all preprocessing, giving input .txt with path to registered functional data
-  melodic -i "inputlist_4groupICA.txt" -o groupICA --tr=$TR --nobet -a concat -m /usr/local/fsl/data/standard/MNI152_T1_2mm_brain_mask.nii.gz --report --Oall -d 30
+  if [[ $auto_n_group_ics == 0 ]]
+  then 
+      melodic -i "inputlist_4groupICA.txt" -o groupICA --tr=$TR --nobet -a concat -m /usr/local/fsl/data/standard/MNI152_T1_2mm_brain_mask.nii.gz --report --Oall -d $n_group_ics
+  else
+      melodic -i "inputlist_4groupICA.txt" -o groupICA --tr=$TR --nobet -a concat -m /usr/local/fsl/data/standard/MNI152_T1_2mm_brain_mask.nii.gz --report --Oall
+  fi
   
   echo "Performed group ICA"
  
