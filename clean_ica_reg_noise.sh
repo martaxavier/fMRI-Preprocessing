@@ -6,7 +6,7 @@
 #------------------------------------------- Build CSF, WM and GS regressors -----------------------------------------#
 #---------------------------------------------------------------------------------------------------------------------# 
 
-cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
 
 # Build csf and wm masks if they don't already exist for the current subject 
 if [[ ! -d masks ]]; then

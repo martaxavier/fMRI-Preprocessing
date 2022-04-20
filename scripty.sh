@@ -6,7 +6,7 @@
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Declare some initial parameters 
-dataset=PARIS
+dataset=NODDI
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
 run="run-1"              # "run-1" "run-2" "run-3"
@@ -41,13 +41,24 @@ if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
     
 # Iterate through subjects 
 for i in "${subj_list[@]}"; do  
-  
+
+  #cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+  #cp filtered_func_data_preprocessed_ica* /home/eeg-fmri/"DATA_${dataset}"/derivatives/func-preproc/$i/task-rest/preprocessed/
+
+  cd $path/$dataset/PREPROCESS/
+#  mkdir $task
+#  mv -f sub* group* input* $task
+
+#  mv $task/$i/$task/* $task/$i/
+  rm -rf $task/$i/$task
+
+
 #  func_data_raw_sub=${i}_${func_data_raw}
   
-  cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
-  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/${i}_T1_crop_restore_brain_pve_1.nii* -thr 1 masks/GM_thr.nii.gz
-  flirt -in masks/GM_thr -ref example_func -applyxfm -init unwarp/highres2example_func.mat -interp nearestneighbour -out masks/EF_GM_thr
-  fslmaths masks/EF_GM_thr -kernel gauss 2.2 -ero -bin masks/EF_GM_ero
+#  cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+#  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/${i}_T1_crop_restore_brain_pve_1.nii* -thr 1 masks/GM_thr.nii.gz
+#  flirt -in masks/GM_thr -ref example_func -applyxfm -init unwarp/highres2example_func.mat -interp nearestneighbour -out masks/EF_GM_thr
+#  fslmaths masks/EF_GM_thr -kernel gauss 2.2 -ero -bin masks/EF_GM_ero
   
 #  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/${i}_T1_crop_restore_brain_pve_1.nii* -thr 1 GM_thr.nii.gz
 

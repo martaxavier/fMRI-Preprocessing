@@ -125,7 +125,7 @@ if [[ $flag_std_reg == 1 ]]; then
   # Iterate through subjects 
   for i in "${subj_list[@]}"; do 
     
-    cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+    cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
     
     fslmaths /usr/local/fsl/data/standard/MNI152_T1_2mm_brain standard
     fslmaths /usr/local/fsl/data/standard/MNI152_T1_2mm standard_head 
@@ -220,7 +220,7 @@ for cleanup in "${cleanup_list[@]}"; do
     # Iterate through subjects 
     for i in "${subj_list[@]}"; do 
       
-      cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+      cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
       . $path/clean_ica_reg_noise.sh 
       
       echo "Nuisance regression (N-ICs + regressors) performed for subject $i"
@@ -244,7 +244,7 @@ for cleanup in "${cleanup_list[@]}"; do
     # Iterate through subjects 
     for i in "${subj_list[@]}"; do 
       
-      cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+      cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
       . $path/clean_fix_noise.sh 
       
       echo "FIX-ICA performed for subject $i"      
@@ -267,7 +267,7 @@ for cleanup in "${cleanup_list[@]}"; do
     # Iterate through subjects 
     for i in "${subj_list[@]}"; do 
       
-      cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+      cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
       . $path/perform_nuisance_reg.sh 
       
       echo "Nuisance regression performed for subject $i"      
@@ -291,7 +291,7 @@ for cleanup in "${cleanup_list[@]}"; do
     # Iterate through subjects 
     for i in "${subj_list[@]}"; do 
       
-      cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+      cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
       . $path/perform_temporal_hpf.sh
       
       echo "Temporal high-pass filtering performed for subject $i"      
@@ -313,7 +313,7 @@ for cleanup in "${cleanup_list[@]}"; do
     # Iterate through subjects 
     for i in "${subj_list[@]}"; do 
     
-      cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+      cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
       . $path/perform_spatial_smoothing.sh
       
       echo "Spatial smoothing performed for subject $i"      
@@ -331,7 +331,7 @@ for cleanup in "${cleanup_list[@]}"; do
   # Iterate through subjects 
   for i in "${subj_list[@]}"; do 
   
-    cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+    cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
     
     # Extract temporal mean of filtered_func_data_preprocessed
     fslmaths $func_data_in -Tmean mean_func

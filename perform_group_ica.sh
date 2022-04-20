@@ -81,8 +81,8 @@ read TR < $tmpdir/TR.txt
 
 
 # Create output directories 
-if [[ ! -d $dataset/PREPROCESS/groupICA ]]; then mkdir $dataset/PREPROCESS/groupICA; fi;
-if [[ ! -d $dataset/PREPROCESS/groupICA.stats ]]; then mkdir $dataset/PREPROCESS/groupICA.stats; fi;
+if [[ ! -d $dataset/PREPROCESS/$task/groupICA ]]; then mkdir $dataset/PREPROCESS/$task/groupICA; fi;
+if [[ ! -d $dataset/PREPROCESS/$task/groupICA.stats ]]; then mkdir $dataset/PREPROCESS/$task/groupICA.stats; fi;
 
 
 #------------------------------------------------- Assign RSN list  --------------------------------------------------# 
@@ -136,7 +136,7 @@ for cleanup in "${cleanup_list[@]}"; do
          if [[ $run == "run-3" ]] && [[ $i == "sub-28" ]]; then continue; fi
        
          # Go to current subject directory
-         cd "$path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir"
+         cd "$path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir"
          
          # Apply warp to obtain filtered_func_data_preprocessed in standard space 
          applywarp --in=$func_data --ref=/usr/local/fsl/data/standard/MNI152_T1_2mm_brain \
@@ -154,7 +154,7 @@ for cleanup in "${cleanup_list[@]}"; do
   #------------------------- Run group ICA using MELODIC multi-session temporal concatenation ------------------------# 
   #-------------------------------------------------------------------------------------------------------------------# 
   
-  cd $path/$dataset/PREPROCESS
+  cd $path/$dataset/PREPROCESS/$task
   
   # Write input list for melodic ica 
   rm inputlist_4groupICA.txt
@@ -167,7 +167,7 @@ for cleanup in "${cleanup_list[@]}"; do
       if [[ $run == "run-3" ]] && [[ $i == "sub-03" ]]; then continue; fi
       if [[ $run == "run-3" ]] && [[ $i == "sub-28" ]]; then continue; fi
          
-      echo $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir/${func_data}2standard >> inputlist_4groupICA.txt
+      echo $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/${func_data}2standard >> inputlist_4groupICA.txt
       
     done
   

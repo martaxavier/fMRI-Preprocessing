@@ -5,7 +5,7 @@
 #------------------------------------- Build regressors (only once for each subject) ---------------------------------#
 #---------------------------------------------------------------------------------------------------------------------# 
 
-cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
 
 # Build csf and wm masks only once for current subject  
 if [[ ! -d masks ]]; then

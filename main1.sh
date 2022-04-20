@@ -104,17 +104,17 @@ for i in "${subj_list[@]}"; do
 
   func_data_raw_sub=${i}_${func_data_raw}
   
-  if [[ ! -d $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir ]]
+  if [[ ! -d $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir ]]
     then 
       mkdir $path/$dataset/PREPROCESS/$i
-      mkdir $path/$dataset/PREPROCESS/$i/$task 
-      mkdir $path/$dataset/PREPROCESS/$i/$task/$run
-      mkdir $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+      mkdir $path/$dataset/PREPROCESS/$task/$i 
+      mkdir $path/$dataset/PREPROCESS/$task/$i/$run
+      mkdir $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
   fi
 
   # Preprocess data 
   # Use dot calling syntax to save parent's environment 
-  cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+  cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
   
   if [[ $dataset == "MIGN2TREAT" ]]
   then
@@ -135,7 +135,7 @@ done
 for i in "${subj_list[@]}"; do  
 
   # Change to subjects directory
-  cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+  cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
   
   # Perform ICA to current data 
   . $path/perform_ica.sh 
@@ -151,7 +151,7 @@ done
 for i in "${subj_list[@]}"; do  
 
   # Change to subjects directory
-  cd $path/$dataset/PREPROCESS/$i/$task/$run/$pedir_dir
+  cd $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir
   
   # Perform FIX to current data 
   . $path/perform_fix.sh 
