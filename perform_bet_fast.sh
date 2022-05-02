@@ -46,7 +46,7 @@ for i in "${subj_list[@]}"; do
     
   # Create linear and non-linear warp transformations from structural to standard space 
   # First perform a linear registration  
-  flirt -in ${i}_T1_crop_restore -ref standard -omat highres2standard_aff.mat -cost corratio -dof 12 -interp trilinear
+  flirt -in ${i}_T1_crop_restore -ref standard_head -omat highres2standard_aff.mat -cost corratio -dof 12 -interp trilinear
     
   # Use the linear transformation to initialize the non-linear registration 
   fnirt --iout=highres2standard_head --in=${i}_T1_crop_restore --aff=highres2standard_aff.mat --cout=highres2standard_coef \

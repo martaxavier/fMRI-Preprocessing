@@ -33,7 +33,8 @@ elif [[ $dataset == "PARIS" ]]; then
   func_data_raw=${task}_${run}_bold.nii.gz
   
   # Subjects
-  subj_list=("sub-04" "sub-05" "sub-06" "sub-07" "sub-08" "sub-09" "sub-10" "sub-11" "sub-12" "sub-13" "sub-14" "sub-15" "sub-16" "sub-17" "sub-19" "sub-20" "sub-21" "sub-22" "sub-23" "sub-24" "sub-25" "sub-27" "sub-29") 
+  subj_list=("sub-04")
+  #subj_list=("sub-05" "sub-06" "sub-07" "sub-08" "sub-09" "sub-10" "sub-11" "sub-12" "sub-13" "sub-14" "sub-15" "sub-16" "sub-17" "sub-19" "sub-20" "sub-21" "sub-22" "sub-23" "sub-24" "sub-25" "sub-27" "sub-29") 
 
 elif [[ $dataset == "NODDI" ]]; then
 

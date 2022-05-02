@@ -133,30 +133,30 @@ if [[ $flag_std_reg == 1 ]]; then
     
     # Create linear and non-linear warp transformations from structural to standard space 
     # First perform a linear registration  
-    flirt -in highres -ref standard -omat highres2standard_aff.mat -cost corratio -dof 12 -interp trilinear
+    flirt -in highres -ref standard -omat unwarp/highres2standard_aff.mat -cost corratio -dof 12 -interp trilinear
     
     # Use the linear transformation to initialize the non-linear registration 
-    fnirt --iout=highres2standard_head --in=highres_head --aff=highres2standard_aff.mat --cout=highres2standard_coef \
-    --iout=highres2standard --jout=highres2highres_jac --config=T1_2_MNI152_2mm --ref=standard_head \
+    fnirt --iout=unwarp/highres2standard_head --in=highres_head --aff=unwarp/highres2standard_aff.mat --cout=unwarp/highres2standard_coef \
+    --iout=unwarp/highres2standard --jout=unwarp/highres2highres_jac --config=T1_2_MNI152_2mm --ref=standard_head \
     --refmask=standard_mask --warpres=10,10,10
     
     # Use the transformation to register the structural image to standard space
-    applywarp -i highres -r standard -o highres2standard -w highres2standard_coef 
+    applywarp -i highres -r standard -o unwarp/highres2standard -w unwarp/highres2standard_coef 
     
     # Obtain transformations from standard to structural space (linear and non-linear)
-    convert_xfm -inverse -omat standard2highres_aff.mat highres2standard_aff.mat
-    invwarp --ref=highres --warp=highres2standard_coef --out=standard2highres_coef  
+    convert_xfm -inverse -omat unwarp/standard2highres_aff.mat unwarp/highres2standard_aff.mat
+    invwarp --ref=highres --warp=unwarp/highres2standard_coef --out=unwarp/standard2highres_coef  
 
     # Create linear and non-linear warp transformation from functional to standard space 
     convert_xfm -omat example_func2standard_aff.mat -concat unwarp/highres2standard_aff.mat unwarp/example_func2highres.mat
-    convertwarp --ref=standard --premat=unwarp/example_func2highres.mat --warp1=unwarp/highres2standard_coef --out=example_func2standard_coef
+    convertwarp --ref=standard --premat=unwarp/example_func2highres.mat --warp1=unwarp/highres2standard_coef --out=unwarp/example_func2standard_coef
     
     # Use the transformation to register the functional image to standard space
-    applywarp --ref=standard --in=example_func --out=example_func2standard --warp=example_func2standard_coef
+    applywarp --ref=standard --in=example_func --out=unwarp/example_func2standard --warp=unwarp/example_func2standard_coef
     
     # Obtain transformations from standard to functional space (linear and non-linear)
-    convert_xfm -inverse -omat standard2example_func_aff.mat example_func2standard_aff.mat
-    invwarp --ref=highres --warp=example_func2standard_coef --out=standard2example_func_coef 
+    convert_xfm -inverse -omat unwarp/standard2example_func_aff.mat unwarp/example_func2standard_aff.mat
+    invwarp --ref=highres --warp=unwarp/example_func2standard_coef --out=unwarp/standard2example_func_coef 
     
     # Create a ventricle mask from an atlas
     fslroi /usr/local/fsl/data/atlases/HarvardOxford/HarvardOxford-sub-prob-2mm.nii.gz LVentricle 2 1 
@@ -168,7 +168,7 @@ if [[ $flag_std_reg == 1 ]]; then
     applywarp --in=Ventricle --ref=highres --out=H_Ventricle --warp=unwarp/standard2highres_coef
     
     # Register the ventrical mask to current subject's functional space 
-    applywarp --in=Ventricle --ref=example_func --out=EF_Ventricle --warp=standard2example_func_coef
+    applywarp --in=Ventricle --ref=example_func --out=EF_Ventricle --warp=unwarp/standard2example_func_coef
     
     # Move warp files to unwarp directory (contains all transformations)
     mv -f standard* example_func2* highres2* standard2* unwarp; rm highres_to*;
