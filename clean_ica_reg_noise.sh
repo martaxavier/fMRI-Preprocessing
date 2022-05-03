@@ -24,7 +24,7 @@ if [[ ! -d masks ]]; then
   # Erode CSF and WM masks 
   fslmaths EF_CSF_thr -kernel gauss 1.8 -ero -bin EF_CSF_ero
   fslmaths EF_WM_thr -kernel gauss 2.2 -ero -bin EF_WM_ero
-  fslmaths EF_GM_thr -kernel gauss 2.2 -ero -bin EF_GM_ero
+  fslmaths EF_GM_thr -kernel gauss 1.2 -ero -bin EF_GM_ero
   
   # Binarize the registered ventricle mask
   fslmaths EF_Ventricle -thr 0.9 -bin EF_Ventricle_bin 
