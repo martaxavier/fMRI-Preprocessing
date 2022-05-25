@@ -1,9 +1,9 @@
 #!/bin/bash
 
-path=/home/mxavier
+path=/home/mxavier/eeg-fmri
 cd $path
 
-dataset=PARIS
+dataset=NODDI
 
 
 #--------------------------------------------------- Read dataset settings -------------------------------------------# 
@@ -27,7 +27,7 @@ for i in "${subj_list[@]}"; do
     anat_data_raw_sub=${i}_${anat_data_raw}
   fi
 
-  cd PARIS/DATA/$i/anat
+  cd $dataset/DATA/$i/anat
   
   # Reorient to standard orientation 
   fslreorient2std $anat_data_raw_sub ${i}_T1_reori

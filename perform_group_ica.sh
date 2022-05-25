@@ -29,20 +29,20 @@ cd $path
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Declare analysis settings 
-dataset=PARIS
+dataset=NODDI
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
-flag_std_reg=0
+flag_std_reg=1
 n_group_ics=30           # 30 for NODDI, 40 for PARIS and CIBM 
 auto_n_group_ics=0       # automatic estimation of the number of group ICs 
 
 # Run list
-#run_list=("run-1")
-run_list=("run-1" "run-2" "run-3")
+run_list=("run-1")
+#run_list=("run-1" "run-2" "run-3")
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
-#cleanup_list=("ica_mo_csf_wm_reg")
+#cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
+cleanup_list=("ica_rp_mo_reg")
 
 # Declare reference RSN template ("smith" - Smith, 2009; "yeo" - Yeo, 2011)  
 rsn_template="smith"
@@ -64,7 +64,7 @@ elif [ $rsn_template == "yeo" ]; then
 
   input_list="list_yeo_rsns.txt"
   ref_dir=STANDARD
-  ref=Yeo11_rsn7.nii.gz
+  ref=Yeo11_rsn7_bin.nii.gz
   
 fi
 
@@ -73,8 +73,10 @@ fi
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Create unique temporary directory 
-if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
+#if find $path/tmp -mindepth 1 -maxdepth 1 | read; then rm $path/tmp/*; fi
 tmpdir=$path/tmp
+
+rm -rf $tmpdir; mkdir $tmpdir
 
 # Read dataset settings
 . settings_dataset.sh
@@ -96,7 +98,7 @@ rsn_num=$(echo "$rsn_num - 1"| bc -l)
 declare -a rsn_list=()
 c=0
   
-while [ $c -le 9 ]; do
+while [ $c -le 9 ] && [ $c -le $rsn_num ]; do
   rsn_list=( "${rsn_list[@]}" "000${c}" ) 
   c=$(echo "$c + 1" | bc -l)
 done
@@ -260,13 +262,28 @@ for cleanup in "${cleanup_list[@]}"; do
   rm STD*
   
   # Move final file to analysis directory 
-  if [[ ! -d $gica_dir ]]; then mkdir $gica_dir; fi;
-  if [[ ! -d "$gica_dir/$rsn_template" ]]; then mkdir "$gica_dir/$rsn_template"; fi;
+  if [[ ! -d $gica_dir ]]
+  	then 
+  	mkdir $gica_dir
+  fi 
+  
+  if [[ ! -d "$gica_dir/$rsn_template" ]]
+  then
+    mkdir "$gica_dir/$rsn_template"
+  else 
+    rm -rf "$gica_dir/$rsn_template"; mkdir "$gica_dir/$rsn_template"
+  fi  
+
   mv group* "$gica_dir/$rsn_template"  
   
   cd ..  
   
-  if [[ ! -d groupICA/$gica_dir ]]; then mkdir groupICA/$gica_dir; fi;
+  if [[ ! -d groupICA/$gica_dir ]]; 
+  	then 
+  	mkdir groupICA/$gica_dir
+  else
+  	rm -rf $groupICA/$gica_dir; mkdir groupICA/$gica_dir
+  fi
   if [[ ! -d "groupICA/$gica_dir/$rsn_template" ]]; then mkdir "groupICA/$gica_dir/$rsn_template"; fi;
   mv -f groupICA/stats groupICA/report groupICA/melo* groupICA/Noise* groupICA/mean* groupICA/mask* groupICA/log* groupICA/eig* groupICA/$gica_dir/$rsn_template
    

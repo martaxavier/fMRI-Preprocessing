@@ -62,13 +62,6 @@ if [[ $flag_wm == 1 ]]; then
   reg_out=( "${reg_out[@]}" "$r" )
 fi
 
-# Add global signal regressor 
-if [[ $flag_gs == 1 ]]; then 
-  cp GS_before_ica_cleanup.txt regressor_gs.txt
-  r=$(echo "$r + 1" | bc -l)    
-  reg_out=( "${reg_out[@]}" "$r" )
-fi
-
 # Add motion outliers regressors 
 if [[ $flag_mo == 1 ]]; then 
 
@@ -171,9 +164,6 @@ if [[ $flag_rp == 1 ]]; then
   
 fi #flag_rp
 
-# Turn reg_out into a comma separated list 
-reg_out=($(echo ${reg_out[@]} | tr " " ","))
-
 # Remove previous confound_design (if existent) and write new one 
 if [[ -f confound_design.txt ]]; then rm confound_design.txt; fi
 paste regressor* | column -s $'\t' -t >> confound_design.txt; rm regressor*
@@ -194,26 +184,30 @@ for n in "${noise_ics[@]}"; do
   c=$(echo "$c + 1" | bc -l); 
 done
 
-noise_ics=($(echo ${noise_ics[@]} | tr " " ","))
-
 if [ "$noise_ics" == "" ]; then
   
   echo "Warning: there are no noise ICs in ${fix_txt_out} for subject $i"
   
+  # Turn reg_out into a comma separated list
+  reg_out=($(echo ${reg_out[@]} | tr " " ","))
+  
   # Perform nonaggressive regression of IC-N and nuisance regressors 
-  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design.txt -f "$reg_out" 
+  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design.txt -f "${reg_out[@]}" 
   
 else
 
-  reg_out=( "${reg_out[@]}" "," ) 
-  reg_out=( "${reg_out[@]}" "$noise_ics" ) 
+  # Join reg_out and noise_ics 
+  reg_out=( "${reg_out[@]}" "${noise_ics[@]}" ) 
+  
+  # Turn reg_out into a comma separated list
+  reg_out=($(echo ${reg_out[@]} | tr " " ","))
     
   # Add confound_design to the melodic_mix
   if [[ -f confound_design_melodic_mix.txt ]]; then rm confound_design_melodic_mix.txt; fi
   paste confound_design.txt mel.ica/filtered_func_data.ica/melodic_mix | column -s $'\t' -t >> confound_design_melodic_mix.txt;
   
   # Perform nonaggressive regression of IC-N and nuisance regressors 
-  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design_melodic_mix.txt -f "$reg_out" 
+  fsl_regfilt -i $func_data_in -o $func_data_out -d confound_design_melodic_mix.txt -f "${reg_out[@]}" 
 
 fi
 

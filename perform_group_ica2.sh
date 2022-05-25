@@ -55,13 +55,13 @@ if [ $rsn_template == "smith" ]; then
 
   input_list="list_smith_rsns.txt"
   ref_dir=STANDARD 
-  ref=PNAS_Smith09_rsn10.nii.gz
+  ref=PNAS_Smith09_rsn10_bin.nii.gz
   
 elif [ $rsn_template == "yeo" ]; then
 
   input_list="list_yeo_rsns.txt"
   ref_dir=STANDARD
-  ref=Yeo11_rsn7.nii.gz
+  ref=Yeo11_rsn7_bin.nii.gz
   
 fi
 
@@ -69,8 +69,11 @@ fi
 #--------------------------------------------------- Read dataset settings -------------------------------------------# 
 #---------------------------------------------------------------------------------------------------------------------# 
 
-if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
+# Create unique temporary directory 
+#if find $path/tmp -mindepth 1 -maxdepth 1 | read; then rm $path/tmp/*; fi
 tmpdir=$path/tmp
+
+rm -rf $tmpdir; mkdir $tmpdir
 
 # Read dataset settings
 . settings_dataset.sh
@@ -86,7 +89,7 @@ rsn_num=$(echo "$rsn_num - 1"| bc -l)
 declare -a rsn_list=()
 c=0
   
-while [ $c -le 9 ]; do
+while [ $c -le 9 ] && [ $c -le $rsn_num ]; do
   rsn_list=( "${rsn_list[@]}" "000${c}" ) 
   c=$(echo "$c + 1" | bc -l)
 done
@@ -115,7 +118,25 @@ for cleanup in "${cleanup_list[@]}"; do
   #---------------------------------------------- Run dual regression ------------------------------------------------# 
   #-------------------------------------------------------------------------------------------------------------------#  
   
+  # Create inputlist_4groupICA .txt file
   cd $dataset/PREPROCESS/$task 
+
+  # Write input list for melodic ica 
+  rm inputlist_4groupICA.txt
+  
+  for run in "${run_list[@]}"; do 
+  
+    for i in "${subj_list[@]}"; do 
+    
+      if [[ $run == "run-2" ]] && [[ $i == "sub-02" ]]; then continue; fi   
+      if [[ $run == "run-3" ]] && [[ $i == "sub-03" ]]; then continue; fi
+      if [[ $run == "run-3" ]] && [[ $i == "sub-28" ]]; then continue; fi
+         
+      echo $path/$dataset/PREPROCESS/$task/$i/$run/$pedir_dir/${func_data}2standard >> inputlist_4groupICA.txt
+      
+    done
+  
+  done
   
   # Perform dual regression, turn on variance normalisation of the timecourses used as stage-2 regressors 
   dual_regression groupICA/$gica_dir/$rsn_template/melodic_IC 1 -1 0 groupICA.dr `cat inputlist_4groupICA.txt`
@@ -224,6 +245,10 @@ for cleanup in "${cleanup_list[@]}"; do
     
     done # subjs
     
+  # Move all files to analysis directory 
+  if [[ ! -d $path/$dataset/PREPROCESS/$task/groupICA.stats/$gica_dir/$rsn_template/$run ]]; then mkdir $path/$dataset/PREPROCESS/$task/groupICA.stats/$gica_dir/$rsn_template/$run; fi;  
+  mv $path/$dataset/PREPROCESS/$task/groupICA.stats/sub* $path/$dataset/PREPROCESS/$task/groupICA.stats/$gica_dir/$rsn_template/$run
+    
   done # runs 
   
   # Move all dual regression files to current analysis directory 
@@ -232,8 +257,5 @@ for cleanup in "${cleanup_list[@]}"; do
   mv -f groupICA.dr/mas* groupICA.dr/dr* groupICA.dr/script* groupICA.dr/$gica_dir/$rsn_template
     
   cd groupICA.stats; rm STD00*
-  
-  # Move all files to analysis directory 
-  mv sub* $gica_dir/$rsn_template
   
 done # cleanup

@@ -19,19 +19,6 @@
 #   subj_list: list of subjects to be analysed 
 #   cleanup_list: cleanup pipeline list (from a predefined list)
 #
-# The cleanup pipelines suported in this version are the following: 
-#    all: ica-fix + nuisance regression (WM, CSF, RP, MO)
-#    all_gs: ica-fix + nuisance regression (WM, CSF, RP, MO, GS)
-#    nuisance: nuisance regression (WM, CSF, RP, MO)
-#    nuisance_gs: nuisance regression (WM, CSF, RP, MO, GS)
-#    icafix: ica-fix 
-#    icafix_physio: ica-fix + nuisance regression (WM, CSF)
-#    icafix_motion: ica-fix + nuisance regression (MO, RP)
-#    nocleanup: none 
-#    ica_mo_reg: ica + nonagressive regression (N-ICs, RP, MO)
-#    ica_mo_csf_reg: ica + nonagressive regression (N-ICs, RP, WM, MO)
-#    ica_mo_csf_wm_reg: ica + nonagressive regression (N-ICs, RP, WM, CSF, MO)
-#
 # Inputs in PREPROCESS/$subj/$pedir_dir directory:
 #    unwarp: directory containing all transformations from EF_D space to EF_U space (vice-versa) and from struc to func space (vice-versa)
 #    mc: directory containing the motion realignment parameters and the linear transformation (.cat) for motion artifact corrected 
@@ -64,18 +51,7 @@
 #    highres2standard_aff: affine transformation from structural to standard space            
 #    highres2standard_coef: warp coefficients from structural to standard space 
 #    highres_coef: warp coefficients from standard to structural space 
-#
-# Output in PREPROCESS/$subj/$pedir_dir directory:
-#    filtered_func_data_clean: functional data after ica-fix cleaning 
-#    filtered_func_data_preprocessed: functional data after ica-fix + nuisance reg + smoothing
-#    filtered_func_data_peprocessed_gs: functional data after ica-fix + nuisance reg (+gs) + smoothing
-#    filtered_func_data_clean_preprocessed: functional data after ica-fix + smoothing
-#    filtered_func_data_clean_physio_preprocessed: functional data after ica-fix + nuisance reg (wm, csf) + smoothing
-#    filtered_func_data_clean_motion_preprocessed: functional data after ica-fix + nuisance reg (mo, rp) + smoothing
-#    filtered_func_data_nuisance_preprocessed: functional data after nuisance reg + hp temporal filtering + smoothing
-#    filtered_func_data_preprocessed_ica_mo_reg: functional data after ica + nonagressive regression of N-IC, RP and MO time-series  
-#    filtered_func_data_preprocessed_ica_mo_csf_reg: functional data after ica + nonagressive regression of N-IC, RP, MO and CSF time-series
-#    filtered_func_data_preprocessed_ica_mo_csf_wm_reg: functional data after ica + nonagressive regression of N-IC, RP, MO, CSF and WM time-series
+
 
 path=/home/mxavier/eeg-fmri/
 cd $path
@@ -85,15 +61,15 @@ cd $path
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Declare analysis settings 
-dataset=PARIS
+dataset=NODDI
 pe_dir="y-"              # phase encoding direction 
 task="task-rest"         # "task-rest" "task-calib"
-run="run-3"              # "run-1" "run-2" "run-3"
+run="run-1"              # "run-1" "run-2" "run-3"
 mo_metric="dvars"
 flag_std_reg=0
 
 # Cleanup list: 
-cleanup_list=("ica_mo_reg" "ica_mo_csf_reg" "ica_mo_csf_wm_reg")
+cleanup_list=("ica_rp_mo_reg")
 
 if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 
@@ -101,8 +77,9 @@ if [[ $pe_dir == y- ]]; then pedir_dir="minusy"; else pedir_dir="plusy"; fi
 #---------------------------------------------------------------------------------------------------------------------# 
 
 # Create unique temporary directory 
-if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
+#if find ${path}tmp -mindepth 1 -maxdepth 1 | read; then rm ${path}tmp/*; fi
 tmpdir=$path/tmp
+rm -rf $tmpdir; mkdir $tmpdir
 
 # Define exit trap
 #trap "rm -f $tmpdir/* ; rmdir $tmpdir ; exit" EXIT
@@ -200,15 +177,20 @@ for cleanup in "${cleanup_list[@]}"; do
   read flag_mo < $tmpdir/flag_mo.txt
   read flag_rp < $tmpdir/flag_rp.txt
   read flag_rp_exp < $tmpdir/flag_rp_exp.txt  
-  read flag_gs < $tmpdir/flag_gs.txt   
+  read flag_ic < $tmpdir/flag_ic.txt   
   read flag_ica_reg < $tmpdir/flag_ica_reg.txt
   read flag_icafix < $tmpdir/flag_icafix.txt
+  read flag_icafixrp < $tmpdir/flag_icafixrp.txt
   read flag_nuisance < $tmpdir/flag_nuisance.txt
   read flag_ss < $tmpdir/flag_ss.txt
   read flag_hpf < $tmpdir/flag_hpf.txt
   read func_data_in < $tmpdir/func_data_in.txt
   read func_data_final < $tmpdir/func_data_final.txt
-
+  
+  if [[ $dataset == "MIGN2TREAT" ]]
+  then
+    flag_ss=1
+  fi 
 
   #---------------------------------------- Perform ICA+Nuisance Reg. Cleanup ----------------------------------------# 
   #-------------------------------------------------------------------------------------------------------------------# 
@@ -238,8 +220,12 @@ for cleanup in "${cleanup_list[@]}"; do
   
   # Perform ica-fix cleanup 
   if [[ $flag_icafix == 1 ]]; then
-    
-    func_data_out="filtered_func_data_clean.nii.gz"
+  
+    if [[ $flag_icafixrp == 1 ]]; then
+      func_data_out="filtered_func_data_cleanrp.nii.gz"
+   else
+     func_data_out="filtered_func_data_clean.nii.gz"
+   fi
     
     # Iterate through subjects 
     for i in "${subj_list[@]}"; do 
