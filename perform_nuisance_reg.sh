@@ -43,13 +43,21 @@ fi
 #--------------------------------------- Confound modeling of input functional data ----------------------------------#
 #---------------------------------------------------------------------------------------------------------------------# 
 
+n_reg=0
 
 # Concatenate nuisance signals to build confound model  
-if [[ $flag_csf == 1 ]]; then cp CSF.txt regressor_csf.txt; fi
-if [[ $flag_wm == 1 ]]; then cp WM.txt regressor_wm.txt; fi
+if [[ $flag_csf == 1 ]]; then 
+  cp CSF.txt regressor_csf.txt
+  n_reg=$(echo "$n_reg + 1" | bc -l)
+fi
+if [[ $flag_wm == 1 ]]; then 
+  cp WM.txt regressor_wm.txt
+  n_reg=$(echo "$n_reg + 1" | bc -l)
+fi
 if [[ $flag_mo == 1 ]]; then 
   if [[ -f "mo_confound_${mo_metric}.txt" ]]; then
     cp "mo_confound_${mo_metric}.txt" regressor_mo.txt
+    n_reg=$(echo "$n_reg + 1" | bc -l)
   else
     echo "Warning: there are no motion outliers for subject $i"
   fi
@@ -108,7 +116,9 @@ if [[ $flag_rp == 1 ]]; then
   
   fi  # flag_hfp
   
-cp $data_out regressor_rp  
+  cp $data_out regressor_rp 
+  n_reg=$(echo "$n_reg + 1" | bc -l)
+   
 fi #flag_rp
 
 if [[ $flag_ic == 1 ]]; then
@@ -130,17 +140,27 @@ if [[ $flag_ic == 1 ]]; then
   done 
   paste reg_ic* >> "regressor_ic.txt"
   rm reg_ic*
+  n_reg=$(echo "$n_reg + 1" | bc -l)
   
 fi
   
 # Remove previous confound_design (if existent) and write new one 
-if [[ -f confound_design.txt ]]; then rm confound_design.txt; fi
-paste regressor* | column -s $'\t' -t >> confound_design.txt; rm regressor*
+if [[ $n_reg == 0 ]]; then
 
-# Extract temporal mean before performing nuisance regression 
-fslmaths $func_data_in -Tmean mean_func 
+  cp $func_data_in $func_data_out 
+  echo "Warning: there are no regressors for subject $i"
 
-# Perform confound regression to clean residual structured noise 
-# Turn on normalisation of both data and design columns to std=1, and demean both data and design columns (or not?)
-fsl_glm --in=$func_data_in --design=confound_design.txt --out_res=$func_data_out
-fslmaths $func_data_out -add mean_func $func_data_out
+else 
+
+  if [[ -f confound_design.txt ]]; then rm confound_design.txt; fi
+  paste regressor* | column -s $'\t' -t >> confound_design.txt; rm regressor*
+  
+  # Extract temporal mean before performing nuisance regression 
+  fslmaths $func_data_in -Tmean mean_func 
+  
+  # Perform confound regression to clean residual structured noise 
+  # Turn on normalisation of both data and design columns to std=1, and demean both data and design columns (or not?)
+  fsl_glm --in=$func_data_in --design=confound_design.txt --out_res=$func_data_out
+  fslmaths $func_data_out -add mean_func $func_data_out
+  
+fi
