@@ -48,24 +48,24 @@
 #---------------------------------------------------------------------------------------------------------------------# 
   
   # Binarize WM and CSF masks from probabilistic maps and copy result to current directory
-  fslmaths $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_0.nii* -thr 1 CSF_thr.nii.gz
-  fslmaths $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_2.nii* -thr 1 WM_thr.nii.gz
-  fslmaths $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_1.nii* -thr 1 GM_thr.nii.gz
+  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_0.nii* -thr 1 CSF_thr.nii.gz
+  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_2.nii* -thr 1 WM_thr.nii.gz
+  fslmaths $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain_pve_1.nii* -thr 1 GM_thr.nii.gz
   
   # Copy fieldmap phase and magnitude (before and after bet) images to current directory 
-  imcp $path/DERIVATIVES/$i/fmap_prepare/"$i"_fmap_mag.nii* FM_U_fmap_mag.nii.gz
-  imcp $path/DERIVATIVES/$i/fmap_prepare/"$i"_fmap_mag_brain.nii* FM_U_fmap_mag_brain.nii.gz
-  imcp $path/DERIVATIVES/$i/fmap_prepare/"$i"_fmap_rads.nii* FM_U_fmap.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/$run/fmap_prepare/"$i"_"$run"_fmap_mag.nii* FM_U_fmap_mag.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/$run/fmap_prepare/"$i"_"$run"_fmap_mag_brain.nii* FM_U_fmap_mag_brain.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/$run/fmap_prepare/"$i"_"$run"_fmap_rads.nii* FM_U_fmap.nii.gz
   
   # Copy original strucutral image and structural image after bet to current directory
-  imcp $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE.nii* highres_head.nii.gz
-  imcp $path/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain.nii* highres.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE.nii* highres_head.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/bet_fast/"$i"_MPRAGE_brain.nii* highres.nii.gz
     
   # Copy registration coefficients from highres to standard space
-  imcp $path/DERIVATIVES/$i/fnirt_reg2standard/reg_nonlinear_coef_T1tostandard_2mm.nii.gz highres2standard_coef.nii.gz
+  imcp $path/$dataset/DERIVATIVES/$i/fnirt_reg2standard/reg_nonlinear_coef_T1tostandard_2mm.nii.gz highres2standard_coef.nii.gz
   
   # Copy functional data to current directory
-  imcp $path/DATA/$i/func/"$i"_"$task"_epi.nii* epi.nii.gz
+  imcp $path/$dataset/DATA/$i/$run/func/"$i"_"$run"_"$task"_acq-ep2d_p2_s3_bold.nii* epi.nii.gz
 
   # Extract example volume from middle volume
   n_vols=$(fslval epi dim4) 
@@ -195,10 +195,8 @@
   -u 1 -w 640 -h 144 -a absolute,relative -o disp.png; cd .. 
   
   # Apply transformations estimated with epi_reg to obtain
-  # the fieldmap brain mask in the undistorted example_func space 
-  applywarp -i FM_U_fmap_mag_brain_mask -r example_func --rel \
-  --premat=unwarp/FM_U_fmap_mag_brain2highres.mat --postmat=unwarp/\
-  highres2example_func.mat -o EF_U_fmap_mag_brain_mask --paddingsize=1
+  # the fieldmap brain mask in the undistorted example_func space
+  applywarp -i FM_U_fmap_mag_brain_mask -r example_func --rel --premat=unwarp/FM_U_fmap_mag_brain2highres.mat --postmat=unwarp/highres2example_func.mat -o EF_U_fmap_mag_brain_mask --paddingsize=1
   
   # Concatenate all 6 estimated realignment parameters in epi_mcf.cat
   cat mc/epi_mcf.mat/MAT* > mc/epi_mcf.cat 
@@ -226,10 +224,8 @@
   # Finally, apply warp to epi data, using as reference undistorted example_func
   # STEP 1 - epi_mcf.cat - linear spatial transformation for motion correction from realignment parameters
   # STEP 2 - example_func2highres_warp - warp coefficients from distorted func space to strucutral space
-  # STEP 3 - highres2example_func.mat -  spatial transformation from structural space to undistorted func space 
-  applywarp -i epi -r example_func -o epi_unwarp --premat=mc/epi_mcf.cat \
-  -w unwarp/example_func2highres_warp --postmat=unwarp/highres2example_func.mat \
-  --rel --interp=spline --paddingsize=1
+  # STEP 3 - highres2example_func.mat -  spatial transformation from structural space to undistorted func space
+  applywarp -i epi -r example_func -o epi_unwarp --premat=mc/epi_mcf.cat -w unwarp/example_func2highres_warp --postmat=unwarp/highres2example_func.mat --rel --interp=spline --paddingsize=1
   
   
   #----------------------------- Brain extraction of 4D data and processing of brain mask  -----------------------------#
@@ -261,8 +257,8 @@
   #---------------------------------------------------------------------------------------------------------------------# 
   
   # Use the skull-stripped time-series as input to identify outliers 
-  fsl_motion_outliers -i epi_thresh -o "mo_confound_${mo_metric}.txt" --$mo_metric --nomoco -m mask -s mc/$mo_metric -p mc/$mo_metric
-  
+  fsl_motion_outliers -i epi_thresh -o "mo_confound_${mo_metric}.txt" --"$mo_metric" --nomoco -m mask -s mc/"${mo_metric}.txt" -p mc/"$mo_metric"
+
   
   #----------------------------------------- Apply temporal filter to 4D EPI data --------------------------------------#
   #---------------------------------------------------------------------------------------------------------------------# 
