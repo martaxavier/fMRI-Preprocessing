@@ -4,6 +4,7 @@
 
 # Go through all preprocessing pipelines 
 
+# CLEANUP #1
 if [[ $cleanup == "nocleanup" ]]; then
 
   flag_ica_reg=0; flag_icafix=0; flag_nuisance=0; flag_icafix_mc=0; 
@@ -13,7 +14,19 @@ if [[ $cleanup == "nocleanup" ]]; then
   func_data_final="filtered_func_data_nocleanup_preprocessed"
   mel_dir="mel_nocleanup.ssica"
   gica_dir="mel_nocleanup.gica"
-  
+
+# CLEANUP #2  
+elif [[ $cleanup == "icafix" ]]; then
+
+  flag_ica_reg=0; flag_icafix=1; flag_nuisance=0; flag_icafixrp=0;
+  flag_ic=0; flag_wm=0; flag_csf=0; flag_mo=0; flag_rp=0; flag_gs=0; 
+  flag_ss=0; flag_hpf=0; flag_rp_exp=0;
+  func_data_in="filtered_func_data.nii.gz"
+  func_data_final="filtered_func_data_preprocessed_icafix"
+  mel_dir="mel_icafix.ssica"
+  gica_dir="mel_icafix.gica"      
+
+# CLEANUP #3  
 elif [[ $cleanup == "icafixrp" ]]; then
 
   flag_ica_reg=0; flag_icafix=1; flag_nuisance=0; flag_icafixrp=1;
@@ -23,7 +36,8 @@ elif [[ $cleanup == "icafixrp" ]]; then
   func_data_final="filtered_func_data_preprocessed_icafixrp"
   mel_dir="mel_icafixrp.ssica"
   gica_dir="mel_icafixrp.gica"    
-  
+
+# CLEANUP #4  
 elif [[ $cleanup == "icafixrp_mo_nui" ]]; then
 
   flag_ica_reg=0; flag_icafix=1; flag_nuisance=1; flag_icafixrp=1;
@@ -34,7 +48,7 @@ elif [[ $cleanup == "icafixrp_mo_nui" ]]; then
   mel_dir="mel_all_icafixrp_mo_nui.ssica"
   gica_dir="mel_all_icafixrp_mo_nui.gica"    
  
-# previous all_2v 
+# CLEANUP #5 
 elif [[ $cleanup == "icafixrp_mo_csf_wm_nui" ]]; then
 
   flag_ica_reg=0; flag_icafix=1; flag_nuisance=1; flag_icafixrp=1;
@@ -45,7 +59,6 @@ elif [[ $cleanup == "icafixrp_mo_csf_wm_nui" ]]; then
   mel_dir="mel_all_icafixrp_mo_csf_wm_nui.ssica"
   gica_dir="mel_all_icafixrp_mo_csf_wm_nui.gica"      
 
-# previous all - but alter bc of rp expansions  
 elif [[ $cleanup == "icafix_rp_mo_csf_wm_nui" ]]; then
 
   flag_ica_reg=0; flag_icafix=1; flag_nuisance=1; flag_icafixrp=0; 
@@ -56,7 +69,8 @@ elif [[ $cleanup == "icafix_rp_mo_csf_wm_nui" ]]; then
   mel_dir="mel_icafix_rp_mo_csf_wm_nui.ssica"
   gica_dir="mel_icafix_rp_mo_csf_wm_nui.gica"
 
- elif [[ $cleanup == "ica_rp_nui" ]]; then
+# CLEANUP #6
+elif [[ $cleanup == "ica_rp_nui" ]]; then
 
   flag_ica_reg=0; flag_icafix=0; flag_nuisance=1; flag_icafixrp=0; 
   flag_ic=1; flag_wm=0; flag_csf=0; flag_mo=0; flag_rp=1; flag_gs=0; 
@@ -65,8 +79,9 @@ elif [[ $cleanup == "icafix_rp_mo_csf_wm_nui" ]]; then
   func_data_final="filtered_func_data_preprocessed_ica_rp_nui"
   mel_dir="mel_ica_rp_nui.ssica"
   gica_dir="mel_ica_rp_nui.gica"   
-    
- elif [[ $cleanup == "ica_rp_mo_nui" ]]; then
+
+# CLEANUP #7     
+elif [[ $cleanup == "ica_rp_mo_nui" ]]; then
 
   flag_ica_reg=0; flag_icafix=0; flag_nuisance=1; flag_icafixrp=0; 
   flag_ic=1; flag_wm=0; flag_csf=0; flag_mo=1; flag_rp=1; flag_gs=0; 
@@ -75,7 +90,8 @@ elif [[ $cleanup == "icafix_rp_mo_csf_wm_nui" ]]; then
   func_data_final="filtered_func_data_preprocessed_ica_rp_mo_nui"
   mel_dir="mel_ica_rp_mo_nui.ssica"
   gica_dir="mel_ica_rp_mo_nui.gica"   
-  
+
+# CLEANUP #8  
 elif [[ $cleanup == "ica_rp_mo_csf_wm_nui" ]]; then
 
   flag_ica_reg=0; flag_icafix=0; flag_nuisance=1; flag_icafixrp=0; 
@@ -86,6 +102,7 @@ elif [[ $cleanup == "ica_rp_mo_csf_wm_nui" ]]; then
   mel_dir="mel_ica_rp_mo_csf_wm_nui.ssica"
   gica_dir="mel_ica_rp_mo_csf_wm_nui.gica"  
   
+# CLEANUP #9  
 elif [[ $cleanup == "rp_mo_csf_wm_nui" ]]; then
 
   flag_ica_reg=0; flag_icafix=0; flag_nuisance=1; flag_icafixrp=0; 
@@ -106,7 +123,6 @@ elif [[ $cleanup == "ica_rp_reg" ]]; then
   mel_dir="mel_ica_rp_reg.ssica"
   gica_dir="mel_ica_rp_reg.gica"
 
-# previous ica_mo_reg  
 elif [[ $cleanup == "ica_rp_mo_reg" ]]; then
 
   flag_ica_reg=1; flag_icafix=0; flag_nuisance=0; flag_icafixrp=0;
@@ -116,8 +132,7 @@ elif [[ $cleanup == "ica_rp_mo_reg" ]]; then
   func_data_final="filtered_func_data_preprocessed_ica_rp_mo_reg"
   mel_dir="mel_ica_rp_mo_reg.ssica"
   gica_dir="mel_ica_rp_mo_reg.gica"
-
-# previous ica_mo_csf_reg  
+ 
 elif [[ $cleanup == "ica_rp_mo_csf_reg" ]]; then
 
   flag_ica_reg=1; flag_icafix=0; flag_nuisance=0; flag_icafixrp=0;
@@ -127,8 +142,7 @@ elif [[ $cleanup == "ica_rp_mo_csf_reg" ]]; then
   func_data_final="filtered_func_data_preprocessed_ica_rp_mo_csf_reg"
   mel_dir="mel_ica_mo_csf_reg.ssica"
   gica_dir="mel_ica_mo_csf_reg.gica"
-  
-# previous ica_mo_csf_wm_reg   
+   
 elif [[ $cleanup == "ica_rp_mo_csf_wm_reg" ]]; then
 
   flag_ica_reg=1; flag_icafix=0; flag_nuisance=0; flag_icafixrp=0;
