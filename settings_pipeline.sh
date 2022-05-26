@@ -55,6 +55,26 @@ elif [[ $cleanup == "icafix_rp_mo_csf_wm_nui" ]]; then
   func_data_final="filtered_func_data_preprocessed_icafix_rp_mo_csf_wm_nui"
   mel_dir="mel_icafix_rp_mo_csf_wm_nui.ssica"
   gica_dir="mel_icafix_rp_mo_csf_wm_nui.gica"
+
+ elif [[ $cleanup == "ica_rp_nui" ]]; then
+
+  flag_ica_reg=0; flag_icafix=0; flag_nuisance=1; flag_icafixrp=0; 
+  flag_ic=1; flag_wm=0; flag_csf=0; flag_mo=0; flag_rp=1; flag_gs=0; 
+  flag_ss=0; flag_hpf=0; flag_rp_exp=1;
+  func_data_in="filtered_func_data.nii.gz"
+  func_data_final="filtered_func_data_preprocessed_ica_rp_nui"
+  mel_dir="mel_ica_rp_nui.ssica"
+  gica_dir="mel_ica_rp_nui.gica"   
+    
+ elif [[ $cleanup == "ica_rp_mo_nui" ]]; then
+
+  flag_ica_reg=0; flag_icafix=0; flag_nuisance=1; flag_icafixrp=0; 
+  flag_ic=1; flag_wm=0; flag_csf=0; flag_mo=1; flag_rp=1; flag_gs=0; 
+  flag_ss=0; flag_hpf=0; flag_rp_exp=1;
+  func_data_in="filtered_func_data.nii.gz"
+  func_data_final="filtered_func_data_preprocessed_ica_rp_mo_nui"
+  mel_dir="mel_ica_rp_mo_nui.ssica"
+  gica_dir="mel_ica_rp_mo_nui.gica"   
   
 elif [[ $cleanup == "ica_rp_mo_csf_wm_nui" ]]; then
 
@@ -65,6 +85,16 @@ elif [[ $cleanup == "ica_rp_mo_csf_wm_nui" ]]; then
   func_data_final="filtered_func_data_preprocessed_ica_rp_mo_csf_wm_nui"
   mel_dir="mel_ica_rp_mo_csf_wm_nui.ssica"
   gica_dir="mel_ica_rp_mo_csf_wm_nui.gica"  
+  
+elif [[ $cleanup == "rp_mo_csf_wm_nui" ]]; then
+
+  flag_ica_reg=0; flag_icafix=0; flag_nuisance=1; flag_icafixrp=0; 
+  flag_ic=0; flag_wm=1; flag_csf=1; flag_mo=1; flag_rp=1; flag_gs=0; 
+  flag_ss=0; flag_hpf=0; flag_rp_exp=1;
+  func_data_in="filtered_func_data.nii.gz"
+  func_data_final="filtered_func_data_preprocessed_rp_mo_csf_wm_nui"
+  mel_dir="mel_rp_mo_csf_wm_nui.ssica"
+  gica_dir="mel_rp_mo_csf_wm_nui.gica"      
       
 elif [[ $cleanup == "ica_rp_reg" ]]; then
 
@@ -105,9 +135,9 @@ elif [[ $cleanup == "ica_rp_mo_csf_wm_reg" ]]; then
   flag_ic=0; flag_wm=1; flag_csf=1; flag_mo=1; flag_rp=1; flag_gs=0; 
   flag_ss=0; flag_hpf=0; flag_rp_exp=1;
   func_data_in="filtered_func_data.nii.gz"
-  func_data_final="filtered_func_data_preprocessed_ica_mo_csf_wm_reg"
-  mel_dir="mel_ica_mo_csf_wm_reg.ssica"
-  gica_dir="mel_ica_mo_csf_wm_reg.gica"  
+  func_data_final="filtered_func_data_preprocessed_ica_rp_mo_csf_wm_reg"
+  mel_dir="mel_ica_rp_mo_csf_wm_reg.ssica"
+  gica_dir="mel_ica_rp_mo_csf_wm_reg.gica"  
     
 fi
 
