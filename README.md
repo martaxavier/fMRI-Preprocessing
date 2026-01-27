@@ -50,7 +50,7 @@ This repository was developed in the context of the following conference abstrac
 
 > Xavier, M., Esteves, I., Araújo, R., Giraud, A.-L., Sadaghiani, S., Wirsich, J., & Figueiredo, P.  
 > **Effect of fMRI denoising strategies on the test–retest reliability of resting state networks.**  
-> Iberian Meeting on Brain and Cognition, 2022. :contentReference[oaicite:0]{index=0}
+> Iberian Meeting on Brain and Cognition, 2022. 
 
 ---
 
